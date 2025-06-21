@@ -75,11 +75,12 @@ body {
 
 .stat-item {
   background: white;
-  padding: 12px;
+  padding: 15px 12px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
+  min-width: 0;
 }
 
 .stat-item:hover {
@@ -87,16 +88,17 @@ body {
 }
 
 .stat-number {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: #667eea;
   margin-bottom: 4px;
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: 12px;
   color: #666;
   font-weight: 500;
+  line-height: 1.2;
 }
 
 /* 网站列表样式 */
@@ -352,15 +354,19 @@ body {
   
   .stats-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
   }
   
   .stat-item {
-    padding: 12px;
+    padding: 12px 10px;
   }
   
   .stat-number {
     font-size: 20px;
+  }
+  
+  .stat-label {
+    font-size: 11px;
   }
 }
 

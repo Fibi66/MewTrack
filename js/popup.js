@@ -55,10 +55,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  const totalSitesEl = document.getElementById('totalSites');
   const activeSitesEl = document.getElementById('activeSites');
   const totalStreakEl = document.getElementById('totalStreak');
-  const maxStreakEl = document.getElementById('maxStreak');
   const sitesListEl = document.getElementById('sitesList');
   const emptyStateEl = document.getElementById('emptyState');
   const loadingEl = document.getElementById('loading');
@@ -111,10 +109,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       
-      totalSitesEl.textContent = stats.totalSites;
       activeSitesEl.textContent = stats.activeSites;
       totalStreakEl.textContent = stats.totalStreak;
-      maxStreakEl.textContent = stats.maxStreak;
 
       const sitesData = await storage.getAllSitesData();
       const sites = Object.entries(sitesData);

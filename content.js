@@ -2,6 +2,12 @@
 (async function() {
   'use strict';
 
+  // 防止重复弹窗的标志
+  let isShowingDialog = false;
+  let lastDetectionTime = 0;
+  let lastDetectionUrl = '';
+  const MIN_DETECTION_INTERVAL = 2000; // 2秒内不重复检测同一URL
+
   // 检查扩展上下文是否有效
   function isExtensionContextValid() {
     try {
@@ -76,6 +82,28 @@
   // 主要检测逻辑
   async function runDetection() {
     try {
+      // 防止短时间内重复检测同一URL
+      const now = Date.now();
+      const currentUrl = window.location.href;
+      
+      // 如果是同一URL且间隔太短，跳过
+      if (currentUrl === lastDetectionUrl && now - lastDetectionTime < MIN_DETECTION_INTERVAL) {
+        if (typeof logger !== 'undefined') {
+          logger.debug('相同URL检测间隔太短，跳过此次检测');
+        }
+        return;
+      }
+      
+      // 如果URL变化了，立即允许检测（对于SPA很重要）
+      if (currentUrl !== lastDetectionUrl) {
+        if (typeof logger !== 'undefined') {
+          logger.debug('URL已变化，执行新的检测');
+        }
+      }
+      
+      lastDetectionTime = now;
+      lastDetectionUrl = currentUrl;
+
       // 检查扩展上下文
       if (!isExtensionContextValid()) {
         // Silently stop when context is invalid
@@ -126,6 +154,14 @@
         }
         return;
       }
+
+      // 检查是否正在显示弹窗
+      if (isShowingDialog) {
+        if (typeof logger !== 'undefined') {
+          logger.debug('弹窗正在显示中，跳过此次检测');
+        }
+        return;
+      }
       
       // 检测是否为学习内容
       let isLearningContent = siteInfo.alwaysLearning;
@@ -161,19 +197,26 @@
           if (typeof logger !== 'undefined') {
             logger.info(`显示目标天数设置弹窗 - ${siteInfo.name}`);
           }
-          await checkInDialog.show(siteInfo.name, window.location.href, domain);
+          isShowingDialog = true;
+          try {
+            await checkInDialog.show(siteInfo.name, window.location.href, domain);
+          } finally {
+            isShowingDialog = false;
+          }
         } else {
           // 已经设置了目标天数，显示正常的打卡弹窗
           if (typeof logger !== 'undefined') {
             logger.info(`准备显示打卡弹窗 - ${siteInfo.name}`);
           }
           
-          await notificationManager.showLearningNotification(
-            domain, 
-            siteInfo.name, 
-            globalStats.totalStreak, // 使用全局streak显示猫猫成长
-            isFirstTime,
-            async () => {
+          isShowingDialog = true;
+          try {
+            await notificationManager.showLearningNotification(
+              domain, 
+              siteInfo.name, 
+              globalStats.totalStreak, // 使用全局streak显示猫猫成长
+              isFirstTime,
+              async () => {
               // 用户点击"确认打卡"后执行的回调
               if (typeof logger !== 'undefined') {
                 logger.info(`用户确认打卡 - ${siteInfo.name}`);
@@ -204,6 +247,9 @@
               }
             }
           );
+          } finally {
+            isShowingDialog = false;
+          }
         }
       } else {
         if (typeof logger !== 'undefined') {
