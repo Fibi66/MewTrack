@@ -1,175 +1,175 @@
-# 🐱 MewTrack - 猫猫成长追踪器
+# 🐱 MewTrack - Cat Growth Tracker
 
-> 追踪你的学习成长，让可爱的猫猫陪伴你的每一天！
+> Track your learning progress and let adorable cats accompany your journey every day!
 
-## ✨ 功能特点
+## ✨ Features
 
-### 🎯 智能学习追踪
-- **多网站支持**：LeetCode、Coursera、YouTube、bilibili、GitHub等20+学习网站
-- **内容智能识别**：自动区分学习内容和娱乐内容（如YouTube/bilibili视频）
-- **独立网站打卡**：每个网站独立追踪，但共享总体成长记录
-- **AI内容分析**：支持使用OpenAI API进行更精准的内容识别
-- **目标设定功能**：为每个网站设定打卡目标天数，追踪进度
-- **自定义网站**：支持添加任意网站进行学习打卡追踪
+### 🎯 Smart Learning Tracking
+- **Multi-Site Support**: 20+ learning websites including LeetCode, Coursera, YouTube, Bilibili, GitHub
+- **Intelligent Content Recognition**: Automatically distinguish between learning and entertainment content (YouTube/Bilibili videos)
+- **Independent Site Check-ins**: Track each website independently while sharing overall growth records
+- **AI Content Analysis**: Support OpenAI API for more precise content identification
+- **Goal Setting Feature**: Set check-in target days for each website and track progress
+- **Custom Websites**: Add any website for learning check-in tracking
 
-### 🐱 可爱猫猫成长系统
-- **🥚 蛋蛋阶段** (0天)：刚开始的小蛋蛋
-- **🐱 小猫咪阶段** (1-9天)：可爱的小猫咪
-- **😸 大猫猫阶段** (10-29天)：成长中的大猫猫  
-- **👑 猫王阶段** (30天+)：学习之王！
+### 🐱 Adorable Cat Growth System
+- **🥚 Egg Stage** (0 days): Just starting little egg
+- **🐱 Kitten Stage** (1-9 days): Cute little kitten
+- **😸 Big Cat Stage** (10-29 days): Growing big cat
+- **👑 Cat King Stage** (30+ days): King of Learning!
 
-### 📊 详细统计功能
-- **总体连续天数**：影响猫猫成长的核心指标
-- **网站独立追踪**：每个网站的个人streak记录
-- **智能连续性管理**：中断时网站变灰但不重置记录
-- **今日打卡统计**：显示今天已打卡的网站数量
+### 📊 Detailed Statistics
+- **Total Consecutive Days**: Core metric affecting cat growth
+- **Independent Site Tracking**: Personal streak records for each website
+- **Smart Continuity Management**: Sites turn gray when interrupted but don't reset records
+- **Daily Check-in Stats**: Shows number of sites checked in today
 
-## 🚀 安装使用
+## 🚀 Installation & Usage
 
-### 1. 安装插件
-1. 打开Chrome浏览器
-2. 进入 `chrome://extensions/`
-3. 开启"开发者模式"
-4. 点击"加载已解压的扩展程序"
-5. 选择MewTrack文件夹
+### 1. Install Extension
+1. Open Chrome browser
+2. Navigate to `chrome://extensions/`
+3. Enable "Developer mode"
+4. Click "Load unpacked"
+5. Select the MewTrack folder
 
-### 2. 开始使用
-1. 访问支持的学习网站
-2. 第一次访问时会弹窗询问是否设置打卡目标天数
-3. 看到打卡弹窗时点击"为今天打卡!"
-4. 点击插件图标查看学习进度
-5. 观察猫猫的成长变化
+### 2. Getting Started
+1. Visit supported learning websites
+2. First-time visitors will see a popup asking to set check-in target days
+3. Click "Check in for today!" when you see the check-in popup
+4. Click the extension icon to view learning progress
+5. Watch your cat grow!
 
-### 3. 设置（可选）
-1. 点击插件图标，然后点击"设置"按钮
-2. 配置OpenAI API密钥以启用AI内容识别
-3. 添加自定义网站进行打卡追踪
-4. 调整通知和自动检测设置
-5. 导入/导出数据备份
+### 3. Settings (Optional)
+1. Click the extension icon, then click "Settings"
+2. Configure OpenAI API key to enable AI content recognition
+3. Add custom websites for check-in tracking
+4. Adjust notification and auto-detection settings
+5. Import/export data backups
 
-## 📱 界面预览
+## 📱 Interface Preview
 
-### 打卡弹窗
-- 显示当前网站信息
-- 展示总体学习进度
-- 预览猫猫成长阶段
-- 鸡汤励志文案
+### Check-in Popup
+- Display current website information
+- Show overall learning progress
+- Preview cat growth stages
+- Motivational messages
 
-### 主界面
-- 总体猫猫成长状态
-- 各网站独立追踪
-- 详细统计数据
-- 数据导出功能
+### Main Interface
+- Overall cat growth status
+- Independent tracking for each website
+- Detailed statistics
+- Data export functionality
 
-## 🌐 支持网站
+## 🌐 Supported Websites
 
-### 📚 学习网站 (总是学习内容)
-- **编程学习**: LeetCode, GitHub, Stack Overflow, freeCodeCamp, Codecademy
-- **在线课程**: Coursera, Udemy, edX, Khan Academy  
-- **技术文档**: MDN Web Docs, W3Schools, GeeksforGeeks
-- **竞赛编程**: HackerRank, CodeChef, Codeforces, AtCoder
+### 📚 Learning Websites (Always Learning Content)
+- **Programming Learning**: LeetCode, GitHub, Stack Overflow, freeCodeCamp, Codecademy
+- **Online Courses**: Coursera, Udemy, edX, Khan Academy
+- **Technical Documentation**: MDN Web Docs, W3Schools, GeeksforGeeks
+- **Competitive Programming**: HackerRank, CodeChef, Codeforces, AtCoder
 
-### 🎥 视频网站 (需内容检测)
-- **YouTube**: 自动识别学习类vs娱乐类视频
-- **哔哩哔哩**: 智能区分教程、科普vs娱乐内容
+### 🎥 Video Websites (Content Detection Required)
+- **YouTube**: Automatically identify learning vs entertainment videos
+- **Bilibili**: Intelligently distinguish tutorials/educational vs entertainment content
 
-### 🔧 自定义网站
-- 通过设置页面添加任意网站
-- 自定义网站默认为学习内容，每次访问都会弹出打卡窗口
-- 支持启用/禁用和删除管理
+### 🔧 Custom Websites
+- Add any website through settings page
+- Custom websites default to learning content, showing check-in popup on each visit
+- Support enable/disable and deletion management
 
-## 🎮 打卡逻辑示例
+## 🎮 Check-in Logic Example
 
 ```
-Day 1: 打卡 bilibili + coursera
-→ 总记录: 1天, bilibili: 1天, coursera: 1天
+Day 1: Check-in bilibili + coursera
+→ Total: 1 day, bilibili: 1 day, coursera: 1 day
 
-Day 2: 只打卡 bilibili  
-→ 总记录: 2天, bilibili: 2天, coursera: 1天(变灰)
+Day 2: Only check-in bilibili
+→ Total: 2 days, bilibili: 2 days, coursera: 1 day (grayed out)
 
-Day 3: 打卡 bilibili + leetcode
-→ 总记录: 3天, bilibili: 3天, coursera: 1天(变灰), leetcode: 1天
+Day 3: Check-in bilibili + leetcode
+→ Total: 3 days, bilibili: 3 days, coursera: 1 day (grayed out), leetcode: 1 day
 ```
 
-## 🔧 技术特性
+## 🔧 Technical Features
 
-- **本地存储**: 使用Chrome Storage API，数据安全可靠
-- **智能检测**: SPA页面变化监听，适配现代Web应用
-- **性能优化**: 防重复弹窗，智能定时检测
-- **用户友好**: 优雅的UI设计，流畅的动画效果
+- **Local Storage**: Uses Chrome Storage API for secure and reliable data
+- **Smart Detection**: SPA page change monitoring, compatible with modern web apps
+- **Performance Optimization**: Prevents duplicate popups, intelligent timed detection
+- **User-Friendly**: Elegant UI design with smooth animations
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 MewTrack/
-├── manifest.json          # 插件配置文件
-├── popup.html            # 弹窗界面
-├── settings.html         # 设置页面
-├── content.js            # 内容脚本
-├── background.js         # 后台脚本
+├── manifest.json          # Extension configuration
+├── popup.html            # Popup interface
+├── settings.html         # Settings page
+├── content.js            # Content script
+├── background.js         # Background script
 ├── js/
-│   ├── storage.js        # 数据存储管理
-│   ├── siteDetector.js   # 网站识别检测
-│   ├── notification.js   # 弹窗通知管理
-│   ├── motivation.js     # 励志文案生成
-│   ├── popup.js          # 弹窗界面逻辑
-│   ├── settings.js       # 设置页面逻辑
-│   ├── openaiIntegration.js  # OpenAI API集成
-│   └── checkInDialog.js  # 打卡天数设置弹窗
+│   ├── storage.js        # Data storage management
+│   ├── siteDetector.js   # Website recognition & detection
+│   ├── notification.js   # Popup notification management
+│   ├── motivation.js     # Motivational message generation
+│   ├── popup.js          # Popup interface logic
+│   ├── settings.js       # Settings page logic
+│   ├── openaiIntegration.js  # OpenAI API integration
+│   └── checkInDialog.js  # Check-in target days dialog
 ├── styles/
-│   ├── popup.css         # 弹窗界面样式
-│   ├── notification.css  # 通知弹窗样式
-│   └── settings.css      # 设置页面样式
-├── icons/                # 插件图标
-├── images/               # 猫猫成长图片
-└── test.html            # 测试页面
+│   ├── popup.css         # Popup interface styles
+│   ├── notification.css  # Notification popup styles
+│   └── settings.css      # Settings page styles
+├── icons/                # Extension icons
+├── images/               # Cat growth images
+└── test.html            # Test page
 ```
 
-## 🐛 问题排查
+## 🐛 Troubleshooting
 
-详细的故障排除指南请查看 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+For detailed troubleshooting guide, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
-### 快速解决方案
+### Quick Solutions
 
-**"Extension context invalidated" 错误**：
-- 刷新网页 (F5) 或重新加载插件
+**"Extension context invalidated" Error**:
+- Refresh the webpage (F5) or reload the extension
 
-**YouTube/Bilibili 不弹窗**：
-- 确保页面完全加载（等待3-5秒）
-- 检查是否今天已经打卡
-- 查看控制台确认是否被判定为娱乐内容
+**YouTube/Bilibili Not Showing Popup**:
+- Ensure page is fully loaded (wait 3-5 seconds)
+- Check if already checked in today
+- Check console to confirm if content is classified as entertainment
 
-**OpenAI API 问题**：
-- 确认API密钥有效且有额度
-- 查看控制台的详细错误信息
+**OpenAI API Issues**:
+- Confirm API key is valid and has quota
+- Check console for detailed error messages
 
-## 📄 开源协议
+## 📄 License
 
-MIT License - 欢迎贡献代码和建议！
+MIT License - Contributions and suggestions welcome!
 
-## 🎉 更新日志
+## 🎉 Changelog
 
 ### v1.2.0 (2024-06-21)
-- ✨ 新增自定义网站功能，支持添加任意网站进行打卡
-- 🔧 修复YouTube和Bilibili视频标题获取问题
-- 🤖 优化AI内容识别准确度
-- 📱 改进视频网站内容检测逻辑
-- 🎯 支持对自定义网站的启用/禁用管理
+- ✨ Added custom website feature, support adding any website for check-ins
+- 🔧 Fixed YouTube and Bilibili video title retrieval issues
+- 🤖 Optimized AI content recognition accuracy
+- 📱 Improved video website content detection logic
+- 🎯 Support enable/disable management for custom websites
 
 ### v1.1.0 (2024-06-21)
-- ✨ 新增OpenAI API集成，支持AI内容识别
-- 🎯 新增目标天数设置功能
-- 📊 添加进度条显示目标完成情况
-- ⚙️ 新增设置页面，支持API配置和数据管理
-- 🔧 优化弹窗交互体验
+- ✨ Added OpenAI API integration, support AI content recognition
+- 🎯 Added target days setting feature
+- 📊 Added progress bar showing goal completion
+- ⚙️ Added settings page, support API configuration and data management
+- 🔧 Optimized popup interaction experience
 
 ### v1.0.0 (2024-06-20)
-- ✨ 初始版本发布
-- 🐱 猫猫成长系统
-- 📊 多网站独立追踪
-- 🎯 智能内容检测
-- 💫 美观UI界面
+- ✨ Initial release
+- 🐱 Cat growth system
+- 📊 Multi-website independent tracking
+- 🎯 Smart content detection
+- 💫 Beautiful UI interface
 
 ---
 
-**让学习变得更有趣，让猫猫陪伴你的成长之路！** 🐱✨ 
+**Make learning more fun, let cats accompany your growth journey!** 🐱✨ 
