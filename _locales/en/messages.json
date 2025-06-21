@@ -529,5 +529,17 @@
   },
   "githubMotiv3": {
     "message": "Code repository managed well, keep it up! 📁"
+  },
+  "unknownSiteDetecting": {
+    "message": "Detecting site content intelligently..."
+  },
+  "unknownSiteLearning": {
+    "message": "Learning-related content detected"
+  },
+  "unknownSiteNotLearning": {
+    "message": "No learning-related content detected"
+  },
+  "aiDetectionRequired": {
+    "message": "AI API key required for intelligent detection of unknown sites"
   }
 }

@@ -110,6 +110,32 @@ class SiteDetector {
         type: 'coding',
         alwaysLearning: true,
         keywords: ['编程', '算法', '竞赛', 'codeforces']
+      },
+      'educative.io': {
+        name: 'Educative',
+        type: 'education',
+        alwaysLearning: true,
+        keywords: ['课程', '学习', '编程', 'educative', 'course', 'tutorial']
+      },
+      'pluralsight.com': {
+        name: 'Pluralsight',
+        type: 'education',
+        alwaysLearning: true,
+        keywords: ['课程', '学习', '技能', 'pluralsight']
+      },
+      'linkedin.com': {
+        name: 'LinkedIn Learning',
+        type: 'education',
+        alwaysLearning: false, // 需要检查是否在learning路径下
+        needsPathCheck: true,
+        learningPaths: ['/learning/', '/learning-login/'],
+        keywords: ['课程', '学习', '职业', 'linkedin learning']
+      },
+      'skillshare.com': {
+        name: 'Skillshare',
+        type: 'education',
+        alwaysLearning: true,
+        keywords: ['课程', '学习', '创意', 'skillshare']
       }
     };
 
@@ -118,8 +144,8 @@ class SiteDetector {
       'youtube.com': {
         name: 'YouTube',
         type: 'video',
-        alwaysLearning: true, // 改为true，确保始终显示打卡界面
-        needsContentDetection: true, // 新增标记，表示需要AI检测内容
+        alwaysLearning: false, // 需要通过AI检测判断是否为学习内容
+        needsContentDetection: true, // 需要AI检测内容
         learningKeywords: [
           '教程', '教学', '学习', '编程', '算法', '数据结构', '课程', '培训',
           'tutorial', 'learn', 'programming', 'algorithm', 'course', 'education',
@@ -135,8 +161,8 @@ class SiteDetector {
       'bilibili.com': {
         name: '哔哩哔哩',
         type: 'video',
-        alwaysLearning: true, // 改为true
-        needsContentDetection: true, // 新增标记
+        alwaysLearning: false, // 需要通过AI检测判断是否为学习内容
+        needsContentDetection: true, // 需要AI检测内容
         learningKeywords: [
           '教程', '教学', '学习', '编程', '算法', '数据结构', '课程', '培训',
           '技术', '科普', '知识', '教育', '学术', '研究', '实验', '理论',
@@ -201,54 +227,11 @@ class SiteDetector {
     return false;
   }
 
-  // 检查是否为学习型网站
+  // 检查是否为学习型网站（已废弃，现在对所有网站都进行检测）
   async isLearningSite(domain = null) {
-    const currentDomain = domain || this.getCurrentDomain();
-    
-    // 确保当前域名有效
-    if (!currentDomain || typeof currentDomain !== 'string') {
-      if (typeof logger !== 'undefined') {
-        logger.error('当前域名无效:', currentDomain);
-      }
-      return false;
-    }
-    
-    // 检查预定义的学习网站
-    for (const configDomain of Object.keys(this.learningSites)) {
-      if (typeof configDomain === 'string' && this.isDomainMatch(currentDomain, configDomain)) {
-        return true;
-      }
-    }
-    
-    // 检查内容检测网站
-    for (const configDomain of Object.keys(this.contentDetectionSites)) {
-      if (typeof configDomain === 'string' && this.isDomainMatch(currentDomain, configDomain)) {
-        return true;
-      }
-    }
-    
-    // 检查用户自定义网站
-    if (typeof mewTrackStorage !== 'undefined') {
-      try {
-        const customSites = await mewTrackStorage.getCustomSites();
-        if (customSites && typeof customSites === 'object') {
-          for (const customDomain of Object.keys(customSites)) {
-            if (typeof customDomain === 'string' && 
-                customSites[customDomain] && 
-                customSites[customDomain].enabled && 
-                this.isDomainMatch(currentDomain, customDomain)) {
-              return true;
-            }
-          }
-        }
-      } catch (error) {
-        if (typeof logger !== 'undefined') {
-          logger.error('检查自定义网站时发生错误:', error);
-        }
-      }
-    }
-    
-    return false;
+    // 为了向后兼容，保留此方法但总是返回true
+    // 实际的学习内容判断会在content.js中通过AI检测完成
+    return true;
   }
 
   // 获取网站信息
@@ -266,6 +249,18 @@ class SiteDetector {
     // 先检查预定义网站
     for (const [siteDomain, siteInfo] of Object.entries(this.learningSites)) {
       if (typeof siteDomain === 'string' && this.isDomainMatch(currentDomain, siteDomain)) {
+        // 检查是否需要路径验证（如LinkedIn Learning）
+        if (siteInfo.needsPathCheck && siteInfo.learningPaths) {
+          const currentPath = window.location.pathname;
+          const isLearningPath = siteInfo.learningPaths.some(path => 
+            currentPath.includes(path)
+          );
+          if (isLearningPath) {
+            return { ...siteInfo, alwaysLearning: true };
+          }
+          // 不在学习路径下，返回null
+          return null;
+        }
         return siteInfo;
       }
     }

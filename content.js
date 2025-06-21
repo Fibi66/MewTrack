@@ -81,6 +81,105 @@
     });
   }
 
+  // 检测未知网站的内容
+  async function detectUnknownSiteContent(domain) {
+    try {
+      // 检查AI识别设置
+      let aiEnabled = true;
+      if (typeof mewTrackStorage !== 'undefined') {
+        try {
+          aiEnabled = await mewTrackStorage.getAIContentDetectionSetting();
+          if (typeof logger !== 'undefined') {
+            logger.debug('AI内容检测设置:', aiEnabled ? '已开启' : '已关闭');
+          }
+        } catch (error) {
+          if (typeof logger !== 'undefined') {
+            logger.debug('获取AI设置失败，使用默认值:', error);
+          }
+        }
+      }
+
+      if (!aiEnabled) {
+        if (typeof logger !== 'undefined') {
+          logger.info('AI智能检测已关闭，跳过未知网站检测');
+        }
+        return false;
+      }
+
+      // 使用OpenAI API分析页面内容
+      if (typeof openAIIntegration !== 'undefined') {
+        await openAIIntegration.init();
+        if (typeof logger !== 'undefined') {
+          logger.debug('OpenAI API密钥状态:', openAIIntegration.apiKey ? '已配置' : '未配置');
+        }
+        
+        if (openAIIntegration.apiKey) {
+          try {
+            // 获取页面标题和描述
+            const pageTitle = document.title || '';
+            const metaDescription = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+            const h1Text = document.querySelector('h1')?.textContent || '';
+            const pageContent = `${pageTitle} ${metaDescription} ${h1Text}`;
+            
+            if (typeof logger !== 'undefined') {
+              logger.debug('准备分析未知网站内容:', {
+                domain: domain,
+                title: pageTitle,
+                description: metaDescription.substring(0, 100) + '...',
+                url: window.location.href
+              });
+            }
+            
+            const analysis = await openAIIntegration.analyzeContent(
+              pageTitle,
+              pageContent,
+              window.location.href
+            );
+            
+            if (analysis && analysis.isLearning !== undefined) {
+              if (typeof logger !== 'undefined') {
+                logger.info('AI智能分析完成:', {
+                  domain: domain,
+                  isLearning: analysis.isLearning,
+                  contentType: analysis.contentType,
+                  reason: analysis.reason
+                });
+              }
+              return analysis.isLearning;
+            } else {
+              if (typeof logger !== 'undefined') {
+                logger.warn('AI返回了无效的分析结果:', analysis);
+              }
+            }
+          } catch (error) {
+            if (typeof logger !== 'undefined') {
+              logger.warn('AI智能分析失败:', error.message);
+            }
+          }
+        } else {
+          if (typeof logger !== 'undefined') {
+            logger.info('OpenAI API未配置，无法进行智能检测');
+          }
+          // 显示提示：需要配置API密钥
+          if (typeof notificationManager !== 'undefined') {
+            notificationManager.showToast(
+              chrome.i18n.getMessage('aiDetectionRequired') || 
+              '需要配置AI API密钥才能智能识别未知网站'
+            );
+          }
+        }
+      }
+      
+      // 如果AI检测失败或未配置，默认返回false
+      return false;
+    } catch (error) {
+      if (typeof logger !== 'undefined') {
+        logger.error('检测未知网站内容时发生错误:', error);
+      }
+      return false;
+    }
+  }
+
   // 主要检测逻辑
   async function runDetection() {
     let domain = null; // Define domain outside try block
@@ -128,29 +227,27 @@
         logger.debug(`规范化域名: ${mewTrackStorage.normalizeDomain(domain)}`);
       }
       
-      // 检查是否为支持的网站
-      const isLearningSite = await siteDetector.isLearningSite(domain);
-      if (typeof logger !== 'undefined') {
-        logger.debug(`${domain} 是否为学习网站: ${isLearningSite}`);
-      }
+      // 移除白名单限制 - 现在对所有网站进行检测
+      // 获取网站信息（预定义网站、自定义网站或新网站）
+      let siteInfo = await siteDetector.getSiteInfo(domain);
       
-      if (!isLearningSite) {
-        if (typeof logger !== 'undefined') {
-          logger.debug(`${domain} 不是支持的学习网站`);
-        }
-        return;
-      }
-      
-      const siteInfo = await siteDetector.getSiteInfo(domain);
-      if (typeof logger !== 'undefined') {
-        logger.info(`检测到学习网站 ${siteInfo?.name} (${domain})`);
-      }
-      
+      // 如果不是预定义或自定义网站，创建临时的网站信息用于AI检测
       if (!siteInfo) {
         if (typeof logger !== 'undefined') {
-          logger.debug(`无法获取 ${domain} 的网站信息`);
+          logger.info(`${domain} 不在预定义列表中，将进行AI智能检测`);
         }
-        return;
+        
+        // 创建临时网站信息
+        siteInfo = {
+          name: domain,
+          type: 'unknown',
+          alwaysLearning: false,  // 需要AI检测
+          needsAIDetection: true  // 标记需要AI检测
+        };
+      }
+      
+      if (typeof logger !== 'undefined') {
+        logger.debug(`检测网站: ${siteInfo.name} (${domain})`);
       }
       
       // 检查今天是否已经打卡过这个网站
@@ -184,8 +281,9 @@
       // 检测是否为学习内容
       let isLearningContent = siteInfo.alwaysLearning;
       
-      // 对于需要内容检测的网站（如YouTube），进行额外的AI检测
-      if (siteInfo.needsContentDetection) {
+      // 对于需要内容检测的网站（如YouTube）或未知网站，进行AI检测
+      if (siteInfo.needsContentDetection || siteInfo.needsAIDetection) {
+        // 对于视频类型网站，检查是否在视频页面
         if (siteInfo.type === 'video' && !siteDetector.isVideoPage()) {
           if (typeof logger !== 'undefined') {
             logger.debug(`${domain} 不是视频页面，跳过检测`);
@@ -203,12 +301,24 @@
         }
         await new Promise(resolve => setTimeout(resolve, waitTime));
         
-        // 检测内容（但不影响打卡流程）
-        const detectedAsLearning = await siteDetector.detectLearningContent();
-        if (typeof logger !== 'undefined') {
-          logger.info(`${domain} AI内容检测结果: ${detectedAsLearning ? '学习内容' : '娱乐内容'}`);
+        // 对于需要AI检测的未知网站，进行通用内容检测
+        if (siteInfo.needsAIDetection) {
+          const detectedAsLearning = await detectUnknownSiteContent(domain);
+          if (typeof logger !== 'undefined') {
+            logger.info(`${domain} AI智能检测结果: ${detectedAsLearning ? '学习内容' : '非学习内容'}`);
+          }
+          
+          // 对于未知网站，AI检测结果决定是否为学习内容
+          isLearningContent = detectedAsLearning;
+        } else {
+          // 对于预定义的内容检测网站（如YouTube），AI检测结果决定是否为学习内容
+          const detectedAsLearning = await siteDetector.detectLearningContent();
+          if (typeof logger !== 'undefined') {
+            logger.info(`${domain} AI内容检测结果: ${detectedAsLearning ? '学习内容' : '娱乐内容'}`);
+          }
+          // 对于内容检测网站，使用AI检测结果
+          isLearningContent = detectedAsLearning;
         }
-        // 可以在这里记录检测结果，但不改变isLearningContent的值
       }
       
       if (isLearningContent) {
@@ -368,15 +478,13 @@
       }
       
       const domain = siteDetector.getCurrentDomain();
-      const isLearningSite = await siteDetector.isLearningSite(domain);
-      if (isLearningSite) {
-        const hasVisitedToday = await mewTrackStorage.hasVisitedToday(domain);
-        if (!hasVisitedToday) {
-          if (typeof logger !== 'undefined') {
-            logger.debug('定期检测触发');
-          }
-          await runDetection();
+      const hasVisitedToday = await mewTrackStorage.hasVisitedToday(domain);
+      if (!hasVisitedToday) {
+        if (typeof logger !== 'undefined') {
+          logger.debug('定期检测触发');
         }
+        // 移除学习网站检查，对所有网站都进行检测
+        await runDetection();
       }
     }, 30000); // 每30秒检测一次
   }

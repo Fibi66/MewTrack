@@ -529,5 +529,17 @@
   },
   "githubMotiv3": {
     "message": "代码仓库管理得很好，继续加油！📁"
+  },
+  "unknownSiteDetecting": {
+    "message": "正在智能检测网站内容..."
+  },
+  "unknownSiteLearning": {
+    "message": "检测到学习相关内容"
+  },
+  "unknownSiteNotLearning": {
+    "message": "未检测到学习相关内容"
+  },
+  "aiDetectionRequired": {
+    "message": "需要配置AI API密钥才能智能识别未知网站"
   }
 }
