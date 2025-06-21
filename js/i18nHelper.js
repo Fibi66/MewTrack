@@ -89,4 +89,4 @@ class I18nHelper {
 }
 
 // Create and export instance
-const i18nHelper = new I18nHelper();
+const i18nHelper = new I18nHelper(); 

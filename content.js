@@ -187,6 +187,7 @@
     try {
       // 确保 i18n 已初始化
       await i18nHelper.init();
+      
       // 防止短时间内重复检测同一URL
       const now = Date.now();
       const currentUrl = window.location.href;

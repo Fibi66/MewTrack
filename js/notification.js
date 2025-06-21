@@ -14,9 +14,12 @@ class NotificationManager {
     }
   }
 
-  // 显示学习提醒弹窗
-  async showLearningNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirm) {
+  // 显示通知
+  async showNotification(domain, siteName, globalStreak, isFirstTime = false) {
     if (this.isShowing) {
+      if (typeof logger !== 'undefined') {
+        logger.debug('通知已显示，跳过此次显示');
+      }
       return;
     }
 
@@ -26,7 +29,7 @@ class NotificationManager {
     // 检查扩展上下文
     if (!this.isExtensionContextValid()) {
       if (typeof logger !== 'undefined') {
-        logger.contextError('扩展上下文已失效，无法显示弹窗');
+        logger.debug('扩展上下文无效，跳过通知显示');
       }
       return;
     }
@@ -41,55 +44,29 @@ class NotificationManager {
     // 添加到页面
     document.body.appendChild(notification);
     
-    // 绑定事件
-    const closeBtn = notification.querySelector('.close-btn');
-    const confirmBtn = notification.querySelector('.confirm-btn');
-    const cancelBtn = notification.querySelector('.cancel-btn');
-
-    closeBtn.addEventListener('click', () => this.hideNotification(notification));
-    cancelBtn.addEventListener('click', () => this.hideNotification(notification));
-    confirmBtn.addEventListener('click', () => {
-      if (onConfirm) {
-        onConfirm();
-      }
-      this.hideNotification(notification);
-    });
-
-    // 动画显示
+    // 添加显示动画
     setTimeout(() => {
       notification.classList.add('show');
     }, 100);
+    
+    // 设置自动隐藏
+    this.autoHideTimer = setTimeout(() => {
+      this.hideNotification();
+    }, 8000);
+    
+    // 绑定事件
+    this.bindEvents(notification, domain);
   }
 
-  // 创建弹窗元素
+  // 创建通知元素
   createNotificationElement(motivation, domain, siteName, globalStreak) {
-    const notification = document.createElement('div');
-    notification.id = this.notificationId;
-    notification.className = 'mewtrack-notification';
-    
-    // 使用全局streak来计算猫猫成长阶段
     const nextStreak = globalStreak + 1;
-    const catStage = this.calculateCatStage(nextStreak);
+    const stage = Math.min(Math.floor(globalStreak / 10), 3);
+    const stageName = this.getStageName(stage);
+    const catImage = chrome.runtime.getURL(`images/cat-stage-${stage + 1}.png`);
     
-    // 安全获取图片URL
-    let catImage;
-    try {
-      if (this.isExtensionContextValid()) {
-        catImage = chrome.runtime.getURL(`images/cat-stage-${catStage}.png`);
-      } else {
-        // 如果扩展上下文失效，使用占位符
-        catImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmZmY0ZDYiLz4KPHN2ZyB4PSI1IiB5PSI1IiB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMiAxNWwtNS01aDEwbC01IDV6IiBmaWxsPSIjNjY3ZWVhIi8+Cjwvc3ZnPgo8L3N2Zz4K';
-      }
-    } catch (error) {
-      if (typeof logger !== 'undefined') {
-        logger.debug('获取图片URL失败，使用占位符');
-      }
-      catImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmZmY0ZDYiLz4KPHN2ZyB4PSI1IiB5PSI1IiB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMiAxNWwtNS01aDEwbC01IDV6IiBmaWxsPSIjNjY3ZWVhIi8+Cjwvc3ZnPgo8L3N2Zz4K';
-    }
-    
-    // 获取成长阶段名称
-    const stageName = this.getStageName(catStage);
-    
+    const notification = document.createElement('div');
+    notification.className = 'mewtrack-notification';
     notification.innerHTML = `
       <div class="notification-content">
         <div class="notification-header">
@@ -131,12 +108,12 @@ class NotificationManager {
   }
 
   // 隐藏弹窗
-  hideNotification(notification) {
-    if (notification && notification.parentElement) {
-      notification.classList.remove('show');
+  hideNotification() {
+    if (this.notification && this.notification.parentElement) {
+      this.notification.classList.remove('show');
       setTimeout(() => {
-        if (notification.parentElement) {
-          notification.parentElement.removeChild(notification);
+        if (this.notification.parentElement) {
+          this.notification.parentElement.removeChild(this.notification);
         }
         this.isShowing = false;
       }, 300);
@@ -156,6 +133,19 @@ class NotificationManager {
         toast.parentElement.removeChild(toast);
       }
     }, 3000);
+  }
+
+  // 绑定事件
+  bindEvents(notification, domain) {
+    const closeBtn = notification.querySelector('.close-btn');
+    const confirmBtn = notification.querySelector('.confirm-btn');
+    const cancelBtn = notification.querySelector('.cancel-btn');
+
+    closeBtn.addEventListener('click', () => this.hideNotification());
+    cancelBtn.addEventListener('click', () => this.hideNotification());
+    confirmBtn.addEventListener('click', () => {
+      this.hideNotification();
+    });
   }
 }
 

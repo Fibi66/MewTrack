@@ -64,8 +64,9 @@ class MotivationGenerator {
     }
     
     // 其次使用网站特定文案
-    if (siteName) {
-      return this.getSiteSpecificMotivation(siteName);
+    const siteMotivation = this.getSiteSpecificMotivation(siteName);
+    if (siteMotivation !== this.getRandomMotivation()) {
+      return siteMotivation;
     }
     
     // 最后使用随机文案
