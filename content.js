@@ -185,6 +185,17 @@
     let domain = null; // Define domain outside try block
     
     try {
+      // 发送消息给 Service Worker 以唤醒它并记录日志
+      if (chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ 
+          action: 'siteDetectionStarted', 
+          url: window.location.href,
+          timestamp: Date.now()
+        }).catch(() => {
+          // 忽略错误
+        });
+      }
+      
       // 确保 i18n 已初始化
       await i18nHelper.init();
       

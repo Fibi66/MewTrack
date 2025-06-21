@@ -3,7 +3,7 @@
 // Import logger for background script
 // Since service workers can't import modules directly, we'll define a simple logger here
 const logger = {
-  logLevel: 1, // Default to errors only
+  logLevel: 4, // Default to errors only
   
   shouldLog(level) {
     return this.logLevel >= level;
@@ -137,6 +137,33 @@ chrome.runtime.onStartup.addListener(async () => {
       logger.error('MewTrack 启动检查失败:', error);
     }
   }
+});
+
+// 监听来自 Content Script 的消息
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (typeof logger !== 'undefined') {
+    logger.info('收到来自 Content Script 的消息:', {
+      action: request.action,
+      url: request.url,
+      tabId: sender.tab?.id,
+      timestamp: new Date(request.timestamp).toLocaleTimeString()
+    });
+  }
+  
+  // 记录网站检测事件
+  if (request.action === 'siteDetectionStarted') {
+    if (typeof logger !== 'undefined') {
+      logger.debug('网站检测开始:', {
+        url: request.url,
+        domain: new URL(request.url).hostname,
+        tabId: sender.tab?.id
+      });
+    }
+  }
+  
+  // 返回确认
+  sendResponse({ received: true });
+  return true; // 保持消息通道开放
 });
 
 if (typeof logger !== 'undefined') {
