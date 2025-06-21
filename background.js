@@ -184,18 +184,54 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // 构建日志前缀
     const prefix = `[MewTrack ${source}${tabInfo} ${timestamp} ${levelName}]`;
     
-    // 根据日志级别使用不同的 console 方法
-    switch (request.level) {
-      case 1: // Error
-        console.error(prefix, request.message, ...request.args);
-        break;
-      case 2: // Warning
-        console.warn(prefix, request.message, ...request.args);
-        break;
-      case 3: // Info
-      case 4: // Debug
-        console.log(prefix, request.message, ...request.args);
-        break;
+    // 特殊处理 siteDetector 日志，提供更详细的信息
+    if (source === 'SITEDETECTOR') {
+      // 为 siteDetector 日志添加特殊格式
+      const siteDetectorPrefix = `[MewTrack SITE-DETECTOR${tabInfo} ${timestamp} ${levelName}]`;
+      
+      // 根据日志级别使用不同的 console 方法
+      switch (request.level) {
+        case 1: // Error
+          console.error(siteDetectorPrefix, request.message, ...request.args);
+          break;
+        case 2: // Warning
+          console.warn(siteDetectorPrefix, request.message, ...request.args);
+          break;
+        case 3: // Info - 重要决策点
+          console.log(`%c${siteDetectorPrefix}`, 'color: #4CAF50; font-weight: bold;', request.message, ...request.args);
+          break;
+        case 4: // Debug - 详细过程
+          console.log(`%c${siteDetectorPrefix}`, 'color: #2196F3;', request.message, ...request.args);
+          break;
+      }
+      
+      // 如果是重要的检测结果，添加额外的视觉提示
+      if (request.level === 3 && typeof request.args[0] === 'object') {
+        const data = request.args[0];
+        if (data.isLearning !== undefined) {
+          const status = data.isLearning ? '✅ 学习内容' : '❌ 非学习内容';
+          const site = data.site || '未知网站';
+          console.log(`%c  └─ ${site}: ${status}`, 'color: #FF9800; font-weight: bold;');
+          
+          if (data.learningScore !== undefined && data.entertainmentScore !== undefined) {
+            console.log(`     └─ 学习得分: ${data.learningScore}, 娱乐得分: ${data.entertainmentScore}`);
+          }
+        }
+      }
+    } else {
+      // 其他来源的日志使用标准格式
+      switch (request.level) {
+        case 1: // Error
+          console.error(prefix, request.message, ...request.args);
+          break;
+        case 2: // Warning
+          console.warn(prefix, request.message, ...request.args);
+          break;
+        case 3: // Info
+        case 4: // Debug
+          console.log(prefix, request.message, ...request.args);
+          break;
+      }
     }
     
     // 如果需要，也可以在 Service Worker 中显示额外信息

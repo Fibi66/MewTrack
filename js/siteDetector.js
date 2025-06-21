@@ -176,6 +176,28 @@ class SiteDetector {
     };
   }
 
+  // 发送日志到后台脚本
+  sendLogToBackground(level, levelName, message, ...args) {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({
+          action: 'log',
+          level: level,
+          levelName: levelName,
+          message: message,
+          args: args,
+          source: 'siteDetector',
+          timestamp: Date.now(),
+          url: window.location.href
+        }).catch(() => {
+          // 忽略错误，后台脚本可能未加载
+        });
+      }
+    } catch (error) {
+      // 忽略错误
+    }
+  }
+
   // 获取当前网站的域名
   getCurrentDomain() {
     try {
@@ -240,11 +262,14 @@ class SiteDetector {
     
     // 确保当前域名有效
     if (!currentDomain || typeof currentDomain !== 'string') {
+      this.sendLogToBackground(1, 'ERROR', 'getSiteInfo: 当前域名无效:', currentDomain);
       if (typeof logger !== 'undefined') {
         logger.error('getSiteInfo: 当前域名无效:', currentDomain);
       }
       return null;
     }
+    
+    this.sendLogToBackground(4, 'DEBUG', '开始获取网站信息:', currentDomain);
     
     // 先检查预定义网站
     for (const [siteDomain, siteInfo] of Object.entries(this.learningSites)) {
@@ -256,17 +281,21 @@ class SiteDetector {
             currentPath.includes(path)
           );
           if (isLearningPath) {
+            this.sendLogToBackground(3, 'INFO', '检测到学习网站 (路径匹配):', siteInfo.name, currentDomain);
             return { ...siteInfo, alwaysLearning: true };
           }
           // 不在学习路径下，返回null
+          this.sendLogToBackground(4, 'DEBUG', 'LinkedIn不在学习路径下:', currentPath);
           return null;
         }
+        this.sendLogToBackground(3, 'INFO', '检测到预定义学习网站:', siteInfo.name, currentDomain);
         return siteInfo;
       }
     }
     
     for (const [siteDomain, siteInfo] of Object.entries(this.contentDetectionSites)) {
       if (typeof siteDomain === 'string' && this.isDomainMatch(currentDomain, siteDomain)) {
+        this.sendLogToBackground(3, 'INFO', '检测到需要内容分析的网站:', siteInfo.name, currentDomain);
         return siteInfo;
       }
     }
@@ -281,6 +310,7 @@ class SiteDetector {
                 siteConfig && 
                 siteConfig.enabled && 
                 this.isDomainMatch(currentDomain, siteDomain)) {
+              this.sendLogToBackground(3, 'INFO', '检测到自定义学习网站:', siteConfig.name || siteDomain, currentDomain);
               return {
                 name: siteConfig.name || siteDomain,
                 type: 'custom',
@@ -291,12 +321,14 @@ class SiteDetector {
           }
         }
       } catch (error) {
+        this.sendLogToBackground(1, 'ERROR', 'getSiteInfo: 检查自定义网站时发生错误:', error);
         if (typeof logger !== 'undefined') {
           logger.error('getSiteInfo: 检查自定义网站时发生错误:', error);
         }
       }
     }
     
+    this.sendLogToBackground(4, 'DEBUG', '未找到匹配的网站信息:', currentDomain);
     return null;
   }
 
@@ -306,19 +338,25 @@ class SiteDetector {
     const siteInfo = await this.getSiteInfo(domain);
 
     if (!siteInfo) {
+      this.sendLogToBackground(4, 'DEBUG', 'detectLearningContent: 无网站信息，跳过检测');
       return false;
     }
 
+    this.sendLogToBackground(4, 'DEBUG', '开始检测学习内容:', siteInfo.name, domain);
+
     // 如果网站总是学习型的，直接返回 true
     if (siteInfo.alwaysLearning) {
+      this.sendLogToBackground(3, 'INFO', '网站总是学习型，直接返回true:', siteInfo.name);
       return true;
     }
 
     // 对于需要内容检测的网站，分析页面内容
     if (siteInfo.type === 'video') {
+      this.sendLogToBackground(4, 'DEBUG', '开始视频内容分析:', siteInfo.name);
       return this.analyzeVideoContent(siteInfo);
     }
 
+    this.sendLogToBackground(4, 'DEBUG', '非视频网站且非总是学习型，返回false');
     return false;
   }
 
@@ -408,6 +446,12 @@ class SiteDetector {
           );
           
           if (analysis && analysis.isLearning !== undefined) {
+            this.sendLogToBackground(3, 'INFO', 'OpenAI分析完成:', {
+              isLearning: analysis.isLearning,
+              contentType: analysis.contentType,
+              reason: analysis.reason,
+              site: siteInfo.name
+            });
             if (typeof logger !== 'undefined') {
               logger.info('OpenAI分析完成，判断结果:', {
                 isLearning: analysis.isLearning,
@@ -417,11 +461,13 @@ class SiteDetector {
             }
             return analysis.isLearning;
           } else {
+            this.sendLogToBackground(2, 'WARN', 'OpenAI返回了无效的分析结果:', analysis);
             if (typeof logger !== 'undefined') {
               logger.warn('OpenAI返回了无效的分析结果:', analysis);
             }
           }
         } catch (error) {
+          this.sendLogToBackground(2, 'WARN', 'OpenAI分析失败，将使用关键词匹配:', error.message);
           if (typeof logger !== 'undefined') {
             logger.warn('OpenAI分析失败，将使用关键词匹配:', error.message);
           }
@@ -451,13 +497,28 @@ class SiteDetector {
     const learningScore = this.calculateKeywordScore(content, siteInfo.learningKeywords);
     const entertainmentScore = this.calculateKeywordScore(content, siteInfo.entertainmentKeywords);
     
+    this.sendLogToBackground(4, 'DEBUG', '关键词匹配得分:', {
+      site: siteInfo.name,
+      learningScore: learningScore,
+      entertainmentScore: entertainmentScore,
+      title: title?.substring(0, 50) + '...',
+      decision: learningScore >= 1 && learningScore >= entertainmentScore
+    });
+    
     if (typeof logger !== 'undefined') {
       logger.debug('关键词匹配得分 - 学习:', learningScore, '娱乐:', entertainmentScore);
     }
     
     // 调整判断逻辑：学习内容需要有学习关键词，且学习得分要高于或等于娱乐得分
     // 降低阈值，让更多教育内容能被识别
-    return learningScore >= 1 && learningScore >= entertainmentScore;
+    const result = learningScore >= 1 && learningScore >= entertainmentScore;
+    this.sendLogToBackground(3, 'INFO', '关键词匹配最终结果:', {
+      site: siteInfo.name,
+      isLearning: result,
+      learningScore: learningScore,
+      entertainmentScore: entertainmentScore
+    });
+    return result;
   }
 
   // 获取视频标题
