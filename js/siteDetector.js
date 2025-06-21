@@ -613,11 +613,11 @@ class SiteDetector {
     const path = window.location.pathname;
     const url = window.location.href;
     
-    if (this.isDomainMatch(domain, ['youtube.com'])) {
+    if (this.isDomainMatch(domain, 'youtube.com')) {
       return path.includes('/watch') || url.includes('watch?v=');
     }
     
-    if (this.isDomainMatch(domain, ['bilibili.com'])) {
+    if (this.isDomainMatch(domain, 'bilibili.com')) {
       return path.includes('/video/') || /\/BV[a-zA-Z0-9]+/.test(path);
     }
     
