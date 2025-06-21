@@ -83,6 +83,8 @@
 
   // 主要检测逻辑
   async function runDetection() {
+    let domain = null; // Define domain outside try block
+    
     try {
       // 确保 i18n 已初始化
       await i18nHelper.init();
@@ -119,7 +121,7 @@
         await openAIIntegration.init();
       }
       
-      const domain = siteDetector.getCurrentDomain();
+      domain = siteDetector.getCurrentDomain();
       if (typeof logger !== 'undefined') {
         logger.debug(`当前检测域名: ${domain}`);
         logger.debug(`完整URL: ${window.location.href}`);
@@ -300,7 +302,9 @@
       }
     } finally {
       // Always remove domain from processing set
-      processingDomains.delete(domain);
+      if (domain) {
+        processingDomains.delete(domain);
+      }
     }
   }
 
