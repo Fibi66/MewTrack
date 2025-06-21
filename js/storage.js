@@ -323,6 +323,37 @@ class MewTrackStorage {
     await this.saveAllData(data);
   }
 
+  // 重置所有学习数据（保留API密钥和设置）
+  async resetLearningData() {
+    try {
+      // 获取当前所有数据
+      const allData = await chrome.storage.local.get(null);
+      
+      // 保留API密钥和设置
+      const preservedData = {
+        openaiApiKey: allData.openaiApiKey,
+        deepseekApiKey: allData.deepseekApiKey,
+        userLanguage: allData.userLanguage
+      };
+      
+      // 清除所有数据
+      await chrome.storage.local.clear();
+      
+      // 恢复API密钥和设置
+      await chrome.storage.local.set(preservedData);
+      
+      // 重新初始化默认数据结构
+      await this.saveAllData(this.defaultData);
+      
+      return true;
+    } catch (error) {
+      if (typeof logger !== 'undefined') {
+        logger.error('重置学习数据失败:', error);
+      }
+      return false;
+    }
+  }
+
   // 获取统计数据
   async getStats() {
     const data = await this.getAllData();

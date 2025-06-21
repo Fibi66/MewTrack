@@ -318,16 +318,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   resetDataBtn.addEventListener('click', async () => {
     if (confirm(i18n.getMessage('confirmResetData'))) {
       try {
-        await chrome.storage.local.clear();
-        showStatus(i18n.getMessage('allDataReset'), 'success');
+        // 使用新的重置方法，保留API密钥和设置
+        const storage = mewTrackStorage || new MewTrackStorage();
+        const success = await storage.resetLearningData();
         
-        // 重新加载设置
-        apiKeyInput.value = '';
-        notificationsEnabled.checked = true;
-        autoDetectEnabled.checked = true;
-        removeApiKeyBtn.disabled = true;
-        testApiKeyBtn.disabled = true;
-        await loadCustomSites();
+        if (success) {
+          showStatus(i18n.getMessage('allDataReset'), 'success');
+          
+          // 重新加载设置（API密钥应该保持不变）
+          await loadSettings();
+        } else {
+          showStatus(i18n.getMessage('resetFailed'), 'error');
+        }
       } catch (error) {
         showStatus(i18n.getMessage('resetFailed') + ': ' + error.message, 'error');
       }

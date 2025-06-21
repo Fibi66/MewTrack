@@ -301,24 +301,13 @@
         }
         await new Promise(resolve => setTimeout(resolve, waitTime));
         
-        // 对于需要AI检测的未知网站，进行通用内容检测
-        if (siteInfo.needsAIDetection) {
-          const detectedAsLearning = await detectUnknownSiteContent(domain);
-          if (typeof logger !== 'undefined') {
-            logger.info(`${domain} AI智能检测结果: ${detectedAsLearning ? '学习内容' : '非学习内容'}`);
-          }
-          
-          // 对于未知网站，AI检测结果决定是否为学习内容
-          isLearningContent = detectedAsLearning;
-        } else {
-          // 对于预定义的内容检测网站（如YouTube），AI检测结果决定是否为学习内容
-          const detectedAsLearning = await siteDetector.detectLearningContent();
-          if (typeof logger !== 'undefined') {
-            logger.info(`${domain} AI内容检测结果: ${detectedAsLearning ? '学习内容' : '娱乐内容'}`);
-          }
-          // 对于内容检测网站，使用AI检测结果
-          isLearningContent = detectedAsLearning;
+        // 检测内容并更新isLearningContent的值
+        const detectedAsLearning = await siteDetector.detectLearningContent();
+        if (typeof logger !== 'undefined') {
+          logger.info(`${domain} AI内容检测结果: ${detectedAsLearning ? '学习内容' : '娱乐内容'}`);
         }
+        // 修复：使用AI检测结果更新isLearningContent
+        isLearningContent = detectedAsLearning;
       }
       
       if (isLearningContent) {

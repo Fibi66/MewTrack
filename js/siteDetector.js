@@ -144,8 +144,8 @@ class SiteDetector {
       'youtube.com': {
         name: 'YouTube',
         type: 'video',
-        alwaysLearning: false, // 需要通过AI检测判断是否为学习内容
-        needsContentDetection: true, // 需要AI检测内容
+        alwaysLearning: false, // 修复：改为false，让AI检测决定是否为学习内容
+        needsContentDetection: true, // 新增标记，表示需要AI检测内容
         learningKeywords: [
           '教程', '教学', '学习', '编程', '算法', '数据结构', '课程', '培训',
           'tutorial', 'learn', 'programming', 'algorithm', 'course', 'education',
@@ -161,8 +161,8 @@ class SiteDetector {
       'bilibili.com': {
         name: '哔哩哔哩',
         type: 'video',
-        alwaysLearning: false, // 需要通过AI检测判断是否为学习内容
-        needsContentDetection: true, // 需要AI检测内容
+        alwaysLearning: false, // 修复：改为false，让AI检测决定是否为学习内容
+        needsContentDetection: true, // 新增标记
         learningKeywords: [
           '教程', '教学', '学习', '编程', '算法', '数据结构', '课程', '培训',
           '技术', '科普', '知识', '教育', '学术', '研究', '实验', '理论',

@@ -213,7 +213,7 @@
     "message": "Import Data"
   },
   "resetData": {
-    "message": "Reset Data"
+    "message": "Reset Learning Data"
   },
   "footerText": {
     "message": "MewTrack v1.2.0 - Let the cat accompany your learning journey 🐱"
@@ -366,10 +366,10 @@
     "message": "Import failed"
   },
   "confirmResetData": {
-    "message": "Are you sure you want to reset all data? This action cannot be undone!"
+    "message": "Are you sure you want to reset all learning data? This will clear your progress, streaks, and site records, but will preserve your API keys and settings. This action cannot be undone!"
   },
   "allDataReset": {
-    "message": "All data has been reset"
+    "message": "Learning data has been reset. API keys and settings have been preserved."
   },
   "resetFailed": {
     "message": "Reset failed"
