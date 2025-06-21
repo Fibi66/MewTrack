@@ -5,9 +5,25 @@ class MewTrackLogger {
     // Log levels: 0 = none, 1 = errors only, 2 = warnings, 3 = info, 4 = debug
     this.logLevel = 1; // Default to errors only
     this.isDevelopment = false;
+    this.isServiceWorker = typeof window === 'undefined';
+    this.source = this.detectSource();
     
     // Load log level from storage
     this.loadLogLevel();
+  }
+  
+  detectSource() {
+    if (this.isServiceWorker) {
+      return 'service-worker';
+    } else if (typeof window !== 'undefined') {
+      // Check if we're in popup, settings, or content script
+      const url = window.location.href;
+      if (url.includes('popup.html')) return 'popup';
+      if (url.includes('settings.html')) return 'settings';
+      if (url.includes('chrome-extension://')) return 'extension-page';
+      return 'content-script';
+    }
+    return 'unknown';
   }
 
   async loadLogLevel() {
@@ -27,32 +43,70 @@ class MewTrackLogger {
   shouldLog(level) {
     return this.logLevel >= level;
   }
+  
+  // Send log to Service Worker for centralized logging
+  async sendToServiceWorker(level, levelName, message, args) {
+    if (!this.isServiceWorker && chrome?.runtime?.sendMessage) {
+      try {
+        await chrome.runtime.sendMessage({
+          action: 'log',
+          source: this.source,
+          level: level,
+          levelName: levelName,
+          message: message,
+          args: args,
+          timestamp: Date.now(),
+          url: window?.location?.href || 'N/A'
+        });
+      } catch (e) {
+        // If Service Worker is not available, fall back to local console
+        // This can happen during extension reload
+      }
+    }
+  }
 
   // Critical errors that should always be logged
   error(message, ...args) {
     if (this.shouldLog(1)) {
-      console.error(`[MewTrack Error] ${message}`, ...args);
+      if (this.isServiceWorker) {
+        console.error(`[MewTrack Error] ${message}`, ...args);
+      } else {
+        // Send to Service Worker for centralized logging
+        this.sendToServiceWorker(1, 'Error', message, args);
+      }
     }
   }
 
   // Warnings that might indicate issues but don't break functionality
   warn(message, ...args) {
     if (this.shouldLog(2)) {
-      console.warn(`[MewTrack Warning] ${message}`, ...args);
+      if (this.isServiceWorker) {
+        console.warn(`[MewTrack Warning] ${message}`, ...args);
+      } else {
+        this.sendToServiceWorker(2, 'Warning', message, args);
+      }
     }
   }
 
   // Informational messages
   info(message, ...args) {
     if (this.shouldLog(3)) {
-      console.log(`[MewTrack Info] ${message}`, ...args);
+      if (this.isServiceWorker) {
+        console.log(`[MewTrack Info] ${message}`, ...args);
+      } else {
+        this.sendToServiceWorker(3, 'Info', message, args);
+      }
     }
   }
 
   // Debug messages for development
   debug(message, ...args) {
     if (this.shouldLog(4)) {
-      console.log(`[MewTrack Debug] ${message}`, ...args);
+      if (this.isServiceWorker) {
+        console.log(`[MewTrack Debug] ${message}`, ...args);
+      } else {
+        this.sendToServiceWorker(4, 'Debug', message, args);
+      }
     }
   }
 

@@ -3,10 +3,21 @@
 // Import logger for background script
 // Since service workers can't import modules directly, we'll define a simple logger here
 const logger = {
-  logLevel: 4, // Default to errors only
+  logLevel: 4, // Default to debug for Service Worker
   
   shouldLog(level) {
     return this.logLevel >= level;
+  },
+  
+  async loadLogLevel() {
+    try {
+      const data = await chrome.storage.local.get(['debugLogLevel']);
+      if (data.debugLogLevel !== undefined) {
+        this.logLevel = data.debugLogLevel;
+      }
+    } catch (e) {
+      // Ignore errors
+    }
   },
   
   error(message, ...args) {
@@ -33,6 +44,17 @@ const logger = {
     }
   }
 };
+
+// 初始化时加载日志级别
+logger.loadLogLevel();
+
+// 监听存储变化以更新日志级别
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'local' && changes.debugLogLevel) {
+    logger.logLevel = changes.debugLogLevel.newValue;
+    logger.info('日志级别已更新为:', logger.logLevel);
+  }
+});
 
 // 监听插件安装事件
 chrome.runtime.onInstalled.addListener((details) => {
@@ -141,6 +163,46 @@ chrome.runtime.onStartup.addListener(async () => {
 
 // 监听来自 Content Script 的消息
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // 处理统一日志消息
+  if (request.action === 'log') {
+    // 检查日志级别
+    if (!logger.shouldLog(request.level)) {
+      sendResponse({ received: true });
+      return true;
+    }
+    
+    const timestamp = new Date(request.timestamp).toLocaleTimeString();
+    const source = request.source.toUpperCase();
+    const levelName = request.levelName;
+    const tabInfo = sender.tab ? `[Tab ${sender.tab.id}]` : '';
+    
+    // 构建日志前缀
+    const prefix = `[MewTrack ${source}${tabInfo} ${timestamp} ${levelName}]`;
+    
+    // 根据日志级别使用不同的 console 方法
+    switch (request.level) {
+      case 1: // Error
+        console.error(prefix, request.message, ...request.args);
+        break;
+      case 2: // Warning
+        console.warn(prefix, request.message, ...request.args);
+        break;
+      case 3: // Info
+      case 4: // Debug
+        console.log(prefix, request.message, ...request.args);
+        break;
+    }
+    
+    // 如果需要，也可以在 Service Worker 中显示额外信息
+    if (request.level === 1 && request.url) {
+      console.error(`  └─ URL: ${request.url}`);
+    }
+    
+    sendResponse({ received: true });
+    return true;
+  }
+  
+  // 原有的消息处理逻辑
   if (typeof logger !== 'undefined') {
     logger.info('收到来自 Content Script 的消息:', {
       action: request.action,
