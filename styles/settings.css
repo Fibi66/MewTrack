@@ -345,3 +345,68 @@ footer {
   color: #666;
   font-size: 14px;
 }
+
+/* 语言切换器样式 */
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.language-switcher .switch {
+  position: relative;
+  width: 100px;
+  height: 32px;
+}
+
+.language-switcher .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #667eea;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.language-switcher .slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.language-switcher input:checked + .slider {
+  background-color: #667eea;
+}
+
+.language-switcher input:checked + .slider:before {
+  transform: translateX(68px);
+}
+
+.language-switcher .label-left,
+.language-switcher .label-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.language-switcher .label-left {
+  left: 12px;
+}
+
+.language-switcher .label-right {
+  right: 12px;
+}

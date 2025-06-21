@@ -1,5 +1,8 @@
 // 设置页面的JavaScript逻辑
 document.addEventListener('DOMContentLoaded', async () => {
+  // 初始化i18n
+  await i18n.init();
+  i18n.applyTranslations();
   // 获取DOM元素
   const apiKeyInput = document.getElementById('api-key');
   const toggleVisibilityBtn = document.getElementById('toggle-visibility');
@@ -19,9 +22,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customSiteNameInput = document.getElementById('custom-site-name');
   const addCustomSiteBtn = document.getElementById('add-custom-site');
   const customSitesContainer = document.getElementById('custom-sites-container');
+  
+  // 语言切换
+  const languageToggle = document.getElementById('language-toggle');
 
   // 加载现有设置
   await loadSettings();
+  
+  // 语言切换事件
+  languageToggle.addEventListener('change', async (e) => {
+    const newLanguage = e.target.checked ? 'en' : 'zh_CN';
+    await i18n.setLanguage(newLanguage);
+  });
 
   // 切换密码可见性
   toggleVisibilityBtn.addEventListener('click', () => {
@@ -258,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const customSites = await storage.getCustomSites();
       
       if (Object.keys(customSites).length === 0) {
-        customSitesContainer.innerHTML = '<div class="empty-custom-sites">还没有添加自定义网站</div>';
+        customSitesContainer.innerHTML = `<div class="empty-custom-sites">${i18n.getMessage('noCustomSites')}</div>`;
         return;
       }
       
@@ -271,9 +283,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="custom-site-actions">
             <label class="custom-site-toggle">
               <input type="checkbox" ${site.enabled ? 'checked' : ''} data-domain="${domain}">
-              <span>启用</span>
+              <span>${i18n.getMessage('enable')}</span>
             </label>
-            <button class="btn-remove" data-domain="${domain}">删除</button>
+            <button class="btn-remove" data-domain="${domain}">${i18n.getMessage('delete')}</button>
           </div>
         </div>
       `).join('');
@@ -310,7 +322,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 加载现有设置
   async function loadSettings() {
     try {
-      const data = await chrome.storage.local.get(['openaiApiKey', 'mewtrack_data']);
+      const data = await chrome.storage.local.get(['openaiApiKey', 'mewtrack_data', 'userLanguage']);
+      
+      // 语言设置
+      const currentLang = data.userLanguage || chrome.i18n.getUILanguage();
+      languageToggle.checked = currentLang === 'en';
       
       // API密钥
       if (data.openaiApiKey) {

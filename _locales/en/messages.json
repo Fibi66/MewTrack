@@ -1,0 +1,212 @@
+{
+  "extensionName": {
+    "message": "MewTrack - Cat Growth Tracker"
+  },
+  "extensionDescription": {
+    "message": "Track your learning growth with a cute cat companion every day!"
+  },
+  "popupTitle": {
+    "message": "MewTrack - View Your Learning Progress"
+  },
+  "settingsTitle": {
+    "message": "MewTrack Settings"
+  },
+  "apiKeyLabel": {
+    "message": "OpenAI API Key"
+  },
+  "apiKeyPlaceholder": {
+    "message": "Enter your OpenAI API key"
+  },
+  "saveButton": {
+    "message": "Save"
+  },
+  "savedMessage": {
+    "message": "Settings saved!"
+  },
+  "customSitesTitle": {
+    "message": "Custom Learning Sites"
+  },
+  "addCustomSite": {
+    "message": "Add Site"
+  },
+  "siteNamePlaceholder": {
+    "message": "Site name"
+  },
+  "siteDomainPlaceholder": {
+    "message": "Domain (e.g., example.com)"
+  },
+  "deleteButton": {
+    "message": "Delete"
+  },
+  "exportDataButton": {
+    "message": "Export Data"
+  },
+  "importDataButton": {
+    "message": "Import Data"
+  },
+  "totalStreakLabel": {
+    "message": "Total Streak"
+  },
+  "todayCheckinsLabel": {
+    "message": "Today's Check-ins"
+  },
+  "sitesLabel": {
+    "message": "sites"
+  },
+  "streakLabel": {
+    "message": "Streak"
+  },
+  "daysLabel": {
+    "message": "days"
+  },
+  "targetLabel": {
+    "message": "Target"
+  },
+  "lastVisitLabel": {
+    "message": "Last visit"
+  },
+  "checkInDialogTitle": {
+    "message": "Set Learning Goal"
+  },
+  "checkInDialogMessage": {
+    "message": "How many days would you like to set as your learning goal for {site}?"
+  },
+  "confirmCheckIn": {
+    "message": "Confirm Check-in"
+  },
+  "skipCheckIn": {
+    "message": "Skip"
+  },
+  "learningDetected": {
+    "message": "Learning content detected!"
+  },
+  "firstTimeMessage": {
+    "message": "Welcome to {site}! Start your learning journey!"
+  },
+  "continueMessage": {
+    "message": "Continue learning at {site} and maintain your streak!"
+  },
+  "checkInSuccess": {
+    "message": "Successfully checked in for {site}! Total streak: {days} days"
+  },
+  "targetProgress": {
+    "message": "Target progress: {current}/{target} days ({percentage}%)"
+  },
+  "targetCompleted": {
+    "message": "🎉 Congratulations on completing your goal!"
+  },
+  "languageLabel": {
+    "message": "Language"
+  },
+  "languageEnglish": {
+    "message": "English"
+  },
+  "languageChinese": {
+    "message": "中文"
+  },
+  "apiKeyDescription": {
+    "message": "With an OpenAI API key, MewTrack can intelligently identify whether web content is educational."
+  },
+  "getApiKey": {
+    "message": "Get API Key"
+  },
+  "saveApiKey": {
+    "message": "Save Key"
+  },
+  "testConnection": {
+    "message": "Test Connection"
+  },
+  "deleteApiKey": {
+    "message": "Delete Key"
+  },
+  "notificationSettings": {
+    "message": "Notification Settings"
+  },
+  "enableNotifications": {
+    "message": "Enable learning reminder notifications"
+  },
+  "autoDetectContent": {
+    "message": "Auto-detect learning content"
+  },
+  "customSiteManagement": {
+    "message": "Custom Site Management"
+  },
+  "customSiteDescription": {
+    "message": "Add other websites you want to track. Check-in popup will appear on each visit."
+  },
+  "siteAddress": {
+    "message": "Site Address:"
+  },
+  "siteAddressPlaceholder": {
+    "message": "e.g., example.com or https://example.com"
+  },
+  "siteNameOptional": {
+    "message": "Site Name (optional):"
+  },
+  "siteNameOptionalPlaceholder": {
+    "message": "e.g., My Learning Site"
+  },
+  "addSite": {
+    "message": "Add Site"
+  },
+  "addedSites": {
+    "message": "Added Sites"
+  },
+  "enable": {
+    "message": "Enable"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "noCustomSites": {
+    "message": "No custom sites added yet"
+  },
+  "dataManagement": {
+    "message": "Data Management"
+  },
+  "exportData": {
+    "message": "Export Data"
+  },
+  "importData": {
+    "message": "Import Data"
+  },
+  "resetData": {
+    "message": "Reset Data"
+  },
+  "footerText": {
+    "message": "MewTrack v1.2.0 - Let the cat accompany your learning journey 🐱"
+  },
+  "trackingSites": {
+    "message": "Tracking Sites"
+  },
+  "activeSites": {
+    "message": "Active Sites"
+  },
+  "totalDays": {
+    "message": "Total Learning Days"
+  },
+  "currentStreak": {
+    "message": "Current Streak"
+  },
+  "catGrowthStage": {
+    "message": "Cat Growth Stage"
+  },
+  "todayLearning": {
+    "message": "Today's Learning"
+  },
+  "notStarted": {
+    "message": "Not Started Yet"
+  },
+  "siteStatistics": {
+    "message": "Site Statistics"
+  },
+  "noSiteData": {
+    "message": "No learning records yet"
+  },
+  "openSettings": {
+    "message": "Open Settings"
+  },
+  "viewAllData": {
+    "message": "View All Data"
+  }
+}

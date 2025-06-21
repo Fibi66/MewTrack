@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MewTrack - 猫猫成长追踪器</title>
+  <title data-i18n="extensionName">MewTrack - 猫猫成长追踪器</title>
   <link rel="stylesheet" href="styles/popup.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
         <img src="icons/cat-48.png" alt="MewTrack" class="logo-img">
         <h1>MewTrack</h1>
       </div>
-      <p class="subtitle">猫猫成长追踪器</p>
+      <p class="subtitle" data-i18n="extensionName">猫猫成长追踪器</p>
     </div>
 
     <!-- 统计信息 -->
@@ -22,26 +22,26 @@
       <div class="stats-grid">
         <div class="stat-item">
           <div class="stat-number" id="totalSites">0</div>
-          <div class="stat-label">追踪网站</div>
+          <div class="stat-label" data-i18n="trackingSites">追踪网站</div>
         </div>
         <div class="stat-item">
           <div class="stat-number" id="activeSites">0</div>
-          <div class="stat-label">活跃网站</div>
+          <div class="stat-label" data-i18n="activeSites">活跃网站</div>
         </div>
         <div class="stat-item">
           <div class="stat-number" id="totalStreak">0</div>
-          <div class="stat-label">总连续天数</div>
+          <div class="stat-label" data-i18n="totalStreakLabel">总连续天数</div>
         </div>
         <div class="stat-item">
           <div class="stat-number" id="maxStreak">0</div>
-          <div class="stat-label">最长连续</div>
+          <div class="stat-label" data-i18n="currentStreak">最长连续</div>
         </div>
       </div>
     </div>
 
     <!-- 网站列表 -->
     <div class="sites-section">
-      <h2>我的学习网站</h2>
+      <h2 data-i18n="siteStatistics">我的学习网站</h2>
       <div class="sites-list" id="sitesList">
         <!-- 网站列表将通过 JavaScript 动态生成 -->
       </div>
@@ -49,15 +49,15 @@
       <!-- 空状态 -->
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">🐱</div>
-        <p>还没有学习记录</p>
+        <p data-i18n="noSiteData">还没有学习记录</p>
         <p class="empty-hint">访问学习网站开始你的成长之旅吧！</p>
       </div>
     </div>
 
     <!-- 底部操作 -->
     <div class="footer">
-      <button class="btn btn-secondary" id="settingsBtn">设置</button>
-      <button class="btn btn-primary" id="exportBtn">导出数据</button>
+      <button class="btn btn-secondary" id="settingsBtn" data-i18n="openSettings">设置</button>
+      <button class="btn btn-primary" id="exportBtn" data-i18n="exportDataButton">导出数据</button>
     </div>
   </div>
 
@@ -69,6 +69,7 @@
 
   <script src="js/logger.js"></script>
   <script src="js/loggerConfig.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/siteDetector.js"></script>
   <script src="js/motivation.js"></script>

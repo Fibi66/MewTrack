@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "MewTrack - 猫猫成长追踪器",
+  "name": "__MSG_extensionName__",
   "version": "1.2.0",
-  "description": "追踪你的学习成长，让可爱的猫猫陪伴你的每一天！",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "zh_CN",
   "permissions": [
     "storage",
     "activeTab",
@@ -33,7 +34,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "MewTrack - 查看你的学习进度",
+    "default_title": "__MSG_popupTitle__",
     "default_icon": {
       "16": "icons/cat-16.png",
       "32": "icons/cat-32.png",

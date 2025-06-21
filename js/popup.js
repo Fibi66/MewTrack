@@ -1,5 +1,8 @@
 // 弹出窗口逻辑
 document.addEventListener('DOMContentLoaded', async () => {
+  // 初始化i18n
+  await i18n.init();
+  i18n.applyTranslations();
   // 检查扩展上下文是否有效
   function isExtensionContextValid() {
     try {

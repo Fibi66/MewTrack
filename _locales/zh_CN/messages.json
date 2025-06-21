@@ -1,0 +1,212 @@
+{
+  "extensionName": {
+    "message": "MewTrack - 猫猫成长追踪器"
+  },
+  "extensionDescription": {
+    "message": "追踪你的学习成长，让可爱的猫猫陪伴你的每一天！"
+  },
+  "popupTitle": {
+    "message": "MewTrack - 查看你的学习进度"
+  },
+  "settingsTitle": {
+    "message": "MewTrack 设置"
+  },
+  "apiKeyLabel": {
+    "message": "OpenAI API 密钥"
+  },
+  "apiKeyPlaceholder": {
+    "message": "请输入你的 OpenAI API 密钥"
+  },
+  "saveButton": {
+    "message": "保存"
+  },
+  "savedMessage": {
+    "message": "设置已保存！"
+  },
+  "customSitesTitle": {
+    "message": "自定义学习网站"
+  },
+  "addCustomSite": {
+    "message": "添加网站"
+  },
+  "siteNamePlaceholder": {
+    "message": "网站名称"
+  },
+  "siteDomainPlaceholder": {
+    "message": "域名 (例如: example.com)"
+  },
+  "deleteButton": {
+    "message": "删除"
+  },
+  "exportDataButton": {
+    "message": "导出数据"
+  },
+  "importDataButton": {
+    "message": "导入数据"
+  },
+  "totalStreakLabel": {
+    "message": "总连续天数"
+  },
+  "todayCheckinsLabel": {
+    "message": "今日打卡"
+  },
+  "sitesLabel": {
+    "message": "网站"
+  },
+  "streakLabel": {
+    "message": "连续"
+  },
+  "daysLabel": {
+    "message": "天"
+  },
+  "targetLabel": {
+    "message": "目标"
+  },
+  "lastVisitLabel": {
+    "message": "最后访问"
+  },
+  "checkInDialogTitle": {
+    "message": "设置学习目标"
+  },
+  "checkInDialogMessage": {
+    "message": "你想为 {site} 设置多少天的学习目标？"
+  },
+  "confirmCheckIn": {
+    "message": "确认打卡"
+  },
+  "skipCheckIn": {
+    "message": "跳过"
+  },
+  "learningDetected": {
+    "message": "检测到学习内容！"
+  },
+  "firstTimeMessage": {
+    "message": "欢迎来到 {site}！开始你的学习之旅吧！"
+  },
+  "continueMessage": {
+    "message": "继续在 {site} 学习，保持你的连续记录！"
+  },
+  "checkInSuccess": {
+    "message": "已为 {site} 打卡成功！总连续天数: {days} 天"
+  },
+  "targetProgress": {
+    "message": "目标进度: {current}/{target} 天 ({percentage}%)"
+  },
+  "targetCompleted": {
+    "message": "🎉 恭喜完成目标！"
+  },
+  "languageLabel": {
+    "message": "语言"
+  },
+  "languageEnglish": {
+    "message": "English"
+  },
+  "languageChinese": {
+    "message": "中文"
+  },
+  "apiKeyDescription": {
+    "message": "设置 OpenAI API 密钥后，MewTrack 可以更智能地识别网页内容是否为学习内容。"
+  },
+  "getApiKey": {
+    "message": "获取 API 密钥"
+  },
+  "saveApiKey": {
+    "message": "保存密钥"
+  },
+  "testConnection": {
+    "message": "测试连接"
+  },
+  "deleteApiKey": {
+    "message": "删除密钥"
+  },
+  "notificationSettings": {
+    "message": "通知设置"
+  },
+  "enableNotifications": {
+    "message": "启用学习提醒通知"
+  },
+  "autoDetectContent": {
+    "message": "自动检测学习内容"
+  },
+  "customSiteManagement": {
+    "message": "自定义网站管理"
+  },
+  "customSiteDescription": {
+    "message": "添加您想要追踪的其他网站，每次访问时都会弹出打卡窗口。"
+  },
+  "siteAddress": {
+    "message": "网站地址:"
+  },
+  "siteAddressPlaceholder": {
+    "message": "例如: example.com 或 https://example.com"
+  },
+  "siteNameOptional": {
+    "message": "网站名称 (可选):"
+  },
+  "siteNameOptionalPlaceholder": {
+    "message": "例如: 我的学习网站"
+  },
+  "addSite": {
+    "message": "添加网站"
+  },
+  "addedSites": {
+    "message": "已添加的网站"
+  },
+  "enable": {
+    "message": "启用"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "noCustomSites": {
+    "message": "还没有添加自定义网站"
+  },
+  "dataManagement": {
+    "message": "数据管理"
+  },
+  "exportData": {
+    "message": "导出数据"
+  },
+  "importData": {
+    "message": "导入数据"
+  },
+  "resetData": {
+    "message": "重置数据"
+  },
+  "footerText": {
+    "message": "MewTrack v1.2.0 - 让猫猫陪伴你的学习之旅 🐱"
+  },
+  "trackingSites": {
+    "message": "追踪网站"
+  },
+  "activeSites": {
+    "message": "活跃网站"
+  },
+  "totalDays": {
+    "message": "总学习天数"
+  },
+  "currentStreak": {
+    "message": "当前连续"
+  },
+  "catGrowthStage": {
+    "message": "猫猫成长阶段"
+  },
+  "todayLearning": {
+    "message": "今日学习"
+  },
+  "notStarted": {
+    "message": "还未开始"
+  },
+  "siteStatistics": {
+    "message": "网站统计"
+  },
+  "noSiteData": {
+    "message": "还没有学习记录"
+  },
+  "openSettings": {
+    "message": "打开设置"
+  },
+  "viewAllData": {
+    "message": "查看所有数据"
+  }
+}
