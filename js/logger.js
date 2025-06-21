@@ -173,13 +173,13 @@ class MewTrackLogger {
 // Export singleton instance
 const logger = new MewTrackLogger();
 
-// 暴露到全局以便调试
+// Expose to global for debugging
 if (typeof window !== 'undefined') {
   window.MewTrackLogger = {
     setLevel: async (level) => {
       logger.logLevel = level;
       await chrome.storage.local.set({ debugLogLevel: level });
-      console.log(`[MewTrack] 日志级别已设置为 ${level}`);
+      console.log(`[MewTrack] Log level set to ${level}`);
     },
     getLevel: () => logger.logLevel,
     testLog: () => {

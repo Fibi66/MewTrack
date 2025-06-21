@@ -1,4 +1,4 @@
-// 后台脚本 - Service Worker
+// Background script - Service Worker
 
 // Import logger for background script
 // Since service workers can't import modules directly, we'll define a simple logger here
@@ -45,24 +45,24 @@ const logger = {
   }
 };
 
-// 初始化时加载日志级别
+// Load log level on initialization
 logger.loadLogLevel();
 
-// 监听存储变化以更新日志级别
+// Listen for storage changes to update log level
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'local' && changes.debugLogLevel) {
     logger.logLevel = changes.debugLogLevel.newValue;
-    logger.info('日志级别已更新为:', logger.logLevel);
+    logger.info('Log level updated to:', logger.logLevel);
   }
 });
 
-// 监听插件安装事件
+// Listen for extension installation events
 chrome.runtime.onInstalled.addListener((details) => {
   if (typeof logger !== 'undefined') {
-    logger.info('MewTrack 插件已安装！🐱', details.reason);
+    logger.info('MewTrack extension installed! 🐱', details.reason);
   }
   
-  // 首次安装时设置默认数据
+  // Set default data on first installation
   if (details.reason === 'install') {
     const defaultData = {
       sites: {},
@@ -80,21 +80,21 @@ chrome.runtime.onInstalled.addListener((details) => {
     };
     chrome.storage.local.set({ mewtrack_data: defaultData }, () => {
       if (typeof logger !== 'undefined') {
-        logger.info('MewTrack 已设置默认存储。');
+        logger.info('MewTrack default storage has been set.');
       }
     });
     
-    // 打开设置页面，引导用户设置
+    // Open settings page to guide user setup
     chrome.tabs.create({ url: chrome.runtime.getURL('settings.html') });
   } else if (details.reason === 'update') {
     if (typeof logger !== 'undefined') {
-      logger.info('MewTrack 已更新到新版本');
+      logger.info('MewTrack has been updated to a new version');
     }
     
-    // 可选：在所有打开的标签页中注入刷新提示
+    // Optional: Inject refresh notification in all open tabs
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
-        // 只在支持的网站上注入提示
+        // Only inject notification on supported sites
         if (tab.url && (
           tab.url.includes('youtube.com') ||
           tab.url.includes('bilibili.com') ||
@@ -102,11 +102,11 @@ chrome.runtime.onInstalled.addListener((details) => {
           tab.url.includes('github.com') ||
           tab.url.includes('coursera.org')
         )) {
-          // 尝试向标签页发送消息
+          // Try to send message to tab
           chrome.tabs.sendMessage(tab.id, { 
             action: 'extensionUpdated' 
           }).catch(() => {
-            // 忽略错误，因为内容脚本可能还未加载
+            // Ignore errors as content script might not be loaded yet
           });
         }
       });
@@ -114,10 +114,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-// 监听每日重置（当浏览器启动时检查日期变化）
+// Listen for daily reset (check date changes when browser starts)
 chrome.runtime.onStartup.addListener(async () => {
   if (typeof logger !== 'undefined') {
-    logger.info('MewTrack 浏览器启动检查...');
+    logger.info('MewTrack browser startup check...');
   }
   try {
     const result = await chrome.storage.local.get('mewtrack_data');
@@ -128,7 +128,7 @@ chrome.runtime.onStartup.addListener(async () => {
       const lastCheckDate = data.globalStats.lastCheckDate;
       
       if (lastCheckDate && lastCheckDate !== today) {
-        // 检查是否需要重置连续性
+        // Check if we need to reset streak
         const lastDate = new Date(lastCheckDate);
         const todayDate = new Date(today);
         const diffTime = todayDate - lastDate;
@@ -136,41 +136,41 @@ chrome.runtime.onStartup.addListener(async () => {
         
         if (diffDays > 1) {
           if (typeof logger !== 'undefined') {
-            logger.info(`检测到 ${diffDays} 天未使用，重置活跃状态`);
+            logger.info(`Detected ${diffDays} days of inactivity, resetting active status`);
           }
-          // 将所有网站设为非活跃状态
+          // Set all sites to inactive status
           Object.values(data.sites).forEach(site => {
             site.isActive = false;
           });
         }
         
-        // 重置今日打卡记录
+        // Reset today's check-in records
         data.globalStats.checkedSitesToday = [];
         data.globalStats.lastCheckDate = today;
         
         await chrome.storage.local.set({ mewtrack_data: data });
         if (typeof logger !== 'undefined') {
-          logger.info('MewTrack: 日期状态已更新');
+          logger.info('MewTrack: Date status has been updated');
         }
       }
     }
   } catch (error) {
     if (typeof logger !== 'undefined') {
-      logger.error('MewTrack 启动检查失败:', error);
+      logger.error('MewTrack startup check failed:', error);
     }
   }
 });
 
-// 监听来自 Content Script 的消息
+// Listen for messages from Content Script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // 立即记录收到的消息（用于调试）
+  // Immediately log received messages (for debugging)
   if (request.action === 'log' && logger.logLevel >= 4) {
-    console.log('[MewTrack SW] 收到日志消息:', request);
+    console.log('[MewTrack SW] Received log message:', request);
   }
   
-  // 处理统一日志消息
+  // Handle unified log messages
   if (request.action === 'log') {
-    // 检查日志级别
+    // Check log level
     if (!logger.shouldLog(request.level)) {
       sendResponse({ received: true });
       return true;
@@ -181,15 +181,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const levelName = request.levelName;
     const tabInfo = sender.tab ? `[Tab ${sender.tab.id}]` : '';
     
-    // 构建日志前缀
+    // Build log prefix
     const prefix = `[MewTrack ${source}${tabInfo} ${timestamp} ${levelName}]`;
     
-    // 特殊处理 siteDetector 日志，提供更详细的信息
+    // Special handling for siteDetector logs, provide more detailed info
     if (source === 'SITEDETECTOR') {
-      // 为 siteDetector 日志添加特殊格式
+      // Add special format for siteDetector logs
       const siteDetectorPrefix = `[MewTrack SITE-DETECTOR${tabInfo} ${timestamp} ${levelName}]`;
       
-      // 根据日志级别使用不同的 console 方法
+      // Use different console methods based on log level
       switch (request.level) {
         case 1: // Error
           console.error(siteDetectorPrefix, request.message, ...request.args);
@@ -197,29 +197,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case 2: // Warning
           console.warn(siteDetectorPrefix, request.message, ...request.args);
           break;
-        case 3: // Info - 重要决策点
+        case 3: // Info - Important decision points
           console.log(`%c${siteDetectorPrefix}`, 'color: #4CAF50; font-weight: bold;', request.message, ...request.args);
           break;
-        case 4: // Debug - 详细过程
+        case 4: // Debug - Detailed process
           console.log(`%c${siteDetectorPrefix}`, 'color: #2196F3;', request.message, ...request.args);
           break;
       }
       
-      // 如果是重要的检测结果，添加额外的视觉提示
+      // If this is an important detection result, add extra visual cues
       if (request.level === 3 && typeof request.args[0] === 'object') {
         const data = request.args[0];
         if (data.isLearning !== undefined) {
-          const status = data.isLearning ? '✅ 学习内容' : '❌ 非学习内容';
-          const site = data.site || '未知网站';
+          const status = data.isLearning ? '✅ Learning content' : '❌ Non-learning content';
+          const site = data.site || 'Unknown site';
           console.log(`%c  └─ ${site}: ${status}`, 'color: #FF9800; font-weight: bold;');
           
           if (data.learningScore !== undefined && data.entertainmentScore !== undefined) {
-            console.log(`     └─ 学习得分: ${data.learningScore}, 娱乐得分: ${data.entertainmentScore}`);
+            console.log(`     └─ Learning score: ${data.learningScore}, Entertainment score: ${data.entertainmentScore}`);
           }
         }
       }
     } else {
-      // 其他来源的日志使用标准格式
+      // Logs from other sources use standard format
       switch (request.level) {
         case 1: // Error
           console.error(prefix, request.message, ...request.args);
@@ -234,7 +234,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     }
     
-    // 如果需要，也可以在 Service Worker 中显示额外信息
+    // If needed, also display additional information in Service Worker
     if (request.level === 1 && request.url) {
       console.error(`  └─ URL: ${request.url}`);
     }
@@ -243,9 +243,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   
-  // 原有的消息处理逻辑
+  // Original message handling logic
   if (typeof logger !== 'undefined') {
-    logger.info('收到来自 Content Script 的消息:', {
+    logger.info('Received message from Content Script:', {
       action: request.action,
       url: request.url,
       tabId: sender.tab?.id,
@@ -253,10 +253,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
   
-  // 记录网站检测事件
+  // Log site detection events
   if (request.action === 'siteDetectionStarted') {
     if (typeof logger !== 'undefined') {
-      logger.debug('网站检测开始:', {
+      logger.debug('Site detection started:', {
         url: request.url,
         domain: new URL(request.url).hostname,
         tabId: sender.tab?.id
@@ -264,11 +264,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
   
-  // 返回确认
+  // Return confirmation
   sendResponse({ received: true });
-  return true; // 保持消息通道开放
+  return true; // Keep message channel open
 });
 
 if (typeof logger !== 'undefined') {
-  logger.info('MewTrack 后台脚本已启动！🐱');
+  logger.info('MewTrack background script started! 🐱');
 } 
