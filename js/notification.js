@@ -20,6 +20,9 @@ class NotificationManager {
       return;
     }
 
+    // 确保 i18n 已初始化
+    await i18nHelper.init();
+
     // 检查扩展上下文
     if (!this.isExtensionContextValid()) {
       if (typeof logger !== 'undefined') {
@@ -30,7 +33,7 @@ class NotificationManager {
 
     this.isShowing = true;
     
-    const motivation = motivationGenerator.generatePersonalizedMotivation(globalStreak, siteName, isFirstTime);
+    const motivation = await motivationGenerator.generatePersonalizedMotivation(globalStreak, siteName, isFirstTime);
     
     // 创建弹窗元素
     const notification = this.createNotificationElement(motivation, domain, siteName, globalStreak);
@@ -91,21 +94,21 @@ class NotificationManager {
       <div class="notification-content">
         <div class="notification-header">
           <div class="cat-avatar">
-            <img src="${catImage}" alt="猫猫" class="cat-image">
+            <img src="${catImage}" alt="${i18nHelper.getMessage('catAlt')}" class="cat-image">
           </div>
           <div class="site-info">
             <h3>${siteName}</h3>
-            <p class="streak-info">总学习连续 ${globalStreak} 天 → ${nextStreak} 天</p>
-            <p class="cat-stage">猫猫成长: ${stageName}</p>
+            <p class="streak-info">${i18nHelper.getMessage('totalLearningStreak')} ${globalStreak} ${i18nHelper.getMessage('days')} → ${nextStreak} ${i18nHelper.getMessage('days')}</p>
+            <p class="cat-stage">${i18nHelper.getMessage('catGrowth')}: ${stageName}</p>
           </div>
-          <button class="close-btn" title="关闭">×</button>
+          <button class="close-btn" title="${i18nHelper.getMessage('close')}">×</button>
         </div>
         <div class="notification-body">
           <p class="motivation-text">${motivation}</p>
         </div>
         <div class="notification-footer">
-          <button class="cancel-btn">以后再说</button>
-          <button class="confirm-btn">为今天打卡! 🎉</button>
+          <button class="cancel-btn">${i18nHelper.getMessage('laterBtn')}</button>
+          <button class="confirm-btn">${i18nHelper.getMessage('checkInTodayBtn')}</button>
         </div>
       </div>
     `;
@@ -123,8 +126,8 @@ class NotificationManager {
 
   // 获取成长阶段名称
   getStageName(stage) {
-    const stageNames = ['🥚 蛋蛋', '🐱 小猫咪', '😸 大猫猫', '👑 猫王'];
-    return stageNames[stage] || '未知';
+    const stageKeys = ['catStageEgg', 'catStageKitten', 'catStageBigCat', 'catStageCatKing'];
+    return i18nHelper.getMessage(stageKeys[stage] || 'catStageUnknown');
   }
 
   // 隐藏弹窗

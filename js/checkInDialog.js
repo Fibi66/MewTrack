@@ -5,22 +5,63 @@ class CheckInDialog {
     this.isOpen = false;
   }
 
+  // 获取本地化消息
+  getMessage(key, substitutions) {
+    return i18nHelper.getMessage(key, substitutions);
+  }
+
   // 创建弹窗HTML
   createDialogHTML(siteName, siteUrl) {
+    // 检测当前语言
+    let isEnglish = false;
+    try {
+      const uiLang = chrome.i18n.getUILanguage();
+      isEnglish = uiLang.startsWith('en');
+    } catch (error) {
+      // 如果无法获取语言，尝试从页面语言判断
+      isEnglish = document.documentElement.lang?.startsWith('en') || 
+                  navigator.language?.startsWith('en') || false;
+    }
+    
+    // 定义所有需要的翻译
+    const translations = isEnglish ? {
+      catAlt: 'Cat',
+      learningDetected: 'Learning Content Detected!',
+      detectedLearningAt: 'Detected you are learning at',
+      createCheckInPlan: 'Create a check-in plan for this site?',
+      targetCheckInDays: 'Target check-in days',
+      days: 'days',
+      setGoalTip: 'Set a goal, let the cat accompany your learning',
+      continuousCheckInTip: 'Continuous check-ins help the cat grow',
+      skip: 'Skip',
+      createPlan: 'Create Plan'
+    } : {
+      catAlt: '猫猫',
+      learningDetected: '发现学习内容！',
+      detectedLearningAt: '检测到您正在学习',
+      createCheckInPlan: '要为这个网站创建打卡计划吗？',
+      targetCheckInDays: '目标打卡天数',
+      days: '天',
+      setGoalTip: '设置目标，猫猫陪您学习',
+      continuousCheckInTip: '连续打卡让猫猫成长',
+      skip: '跳过',
+      createPlan: '创建计划'
+    };
+    
     return `
       <div class="mewtrack-checkin-dialog-overlay">
         <div class="mewtrack-checkin-dialog">
           <div class="mewtrack-dialog-header">
-            <img src="${chrome.runtime.getURL('images/cat-stage-2.png')}" alt="${chrome.i18n.getMessage('catAlt') || '猫猫'}" class="mewtrack-dialog-cat">
-            <h2>${chrome.i18n.getMessage('learningDetected') || '发现学习内容！'}</h2>
+            <img src="${chrome.runtime.getURL('images/cat-stage-2.png')}" alt="${translations.catAlt}" class="mewtrack-dialog-cat">
+            <h2>${translations.learningDetected}</h2>
           </div>
           
           <div class="mewtrack-dialog-content">
-            <p>${chrome.i18n.getMessage('detectedLearningAt') || '检测到您正在学习'} <strong>${siteName}</strong></p>
-            <p class="mewtrack-dialog-question">${chrome.i18n.getMessage('createCheckInPlan') || '要为这个网站创建打卡计划吗？'}</p>
+            <p>${translations.detectedLearningAt} <strong>${siteName}</strong></p>
+            <p class="mewtrack-dialog-question">${translations.createCheckInPlan}</p>
             
             <div class="mewtrack-target-days">
-              <label for="mewtrack-target-days-input">${chrome.i18n.getMessage('targetCheckInDays') || '目标打卡天数'}:</label>
+              <label for="mewtrack-target-days-input">${translations.targetCheckInDays}:</label>
               <input 
                 type="number" 
                 id="mewtrack-target-days-input" 
@@ -29,21 +70,21 @@ class CheckInDialog {
                 value="30" 
                 class="mewtrack-days-input"
               >
-              <span>${chrome.i18n.getMessage('days') || '天'}</span>
+              <span>${translations.days}</span>
             </div>
             
             <div class="mewtrack-dialog-tips">
-              <p>💡 ${chrome.i18n.getMessage('setGoalTip') || '设置目标，猫猫陪您学习'}</p>
-              <p>🎯 ${chrome.i18n.getMessage('continuousCheckInTip') || '连续打卡让猫猫成长'}</p>
+              <p>💡 ${translations.setGoalTip}</p>
+              <p>🎯 ${translations.continuousCheckInTip}</p>
             </div>
           </div>
           
           <div class="mewtrack-dialog-actions">
             <button class="mewtrack-btn mewtrack-btn-cancel" id="mewtrack-cancel-btn">
-              ${chrome.i18n.getMessage('skip') || '跳过'}
+              ${translations.skip}
             </button>
             <button class="mewtrack-btn mewtrack-btn-confirm" id="mewtrack-confirm-btn">
-              ${chrome.i18n.getMessage('createPlan') || '创建计划'}
+              ${translations.createPlan}
             </button>
           </div>
         </div>
@@ -249,6 +290,9 @@ class CheckInDialog {
   async show(siteName, siteUrl, domain) {
     if (this.isOpen) return;
 
+    // 确保 i18n 已初始化
+    await i18nHelper.init();
+
     // 检查是否已经为该网站设置过打卡天数
     const siteData = await mewTrackStorage.getSiteData(domain);
     if (siteData.targetDays > 0) {
@@ -290,9 +334,18 @@ class CheckInDialog {
       await mewTrackStorage.setTargetDays(domain, targetDays);
       
       // 显示成功提示
-      const targetSetMessage = chrome.i18n.getMessage('targetSetSuccess') || 
+      let isEnglish = false;
+      try {
+        const uiLang = chrome.i18n.getUILanguage();
+        isEnglish = uiLang.startsWith('en');
+      } catch (error) {
+        isEnglish = document.documentElement.lang?.startsWith('en') || 
+                    navigator.language?.startsWith('en') || false;
+      }
+      const targetSetMessage = isEnglish ? 
+        `Target set: ${targetDays} days! Keep going! 🎯` : 
         `已为该网站设置 ${targetDays} 天的打卡目标！加油！🎯`;
-      notificationManager.showToast(targetSetMessage.replace('{days}', targetDays));
+      notificationManager.showToast(targetSetMessage);
       
       this.close();
       
@@ -300,13 +353,10 @@ class CheckInDialog {
       const result = await mewTrackStorage.updateSiteVisit(domain, true);
       if (result.isNewVisit) {
         const siteInfo = await siteDetector.getSiteInfo(domain);
-        const message = chrome.i18n.getMessage('checkInSuccess') || 
+        const message = isEnglish ? 
+          `Check-in successful for ${siteInfo.name}! Total streak: ${result.globalStats.totalStreak} days` : 
           `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
-        // 替换占位符
-        const formattedMessage = message
-          .replace('{site}', siteInfo.name)
-          .replace('{days}', result.globalStats.totalStreak);
-        notificationManager.showToast(formattedMessage);
+        notificationManager.showToast(message);
       }
     });
 

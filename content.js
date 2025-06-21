@@ -84,6 +84,8 @@
   // 主要检测逻辑
   async function runDetection() {
     try {
+      // 确保 i18n 已初始化
+      await i18nHelper.init();
       // 防止短时间内重复检测同一URL
       const now = Date.now();
       const currentUrl = window.location.href;
@@ -259,12 +261,20 @@
               
               if (result.isNewVisit) {
                 const progress = await mewTrackStorage.getTargetProgress(normalizedDomain);
-                let message = `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
+                
+                let message = i18nHelper.getMessage('checkInSuccessMsg', {
+                  site: siteInfo.name,
+                  days: result.globalStats.totalStreak
+                });
                 
                 if (progress && !progress.isCompleted) {
-                  message += `\n目标进度: ${progress.current}/${progress.target} 天 (${progress.percentage}%)`;
+                  message += '\n' + i18nHelper.getMessage('targetProgressMsg', {
+                    current: progress.current,
+                    target: progress.target,
+                    percentage: progress.percentage
+                  });
                 } else if (progress && progress.isCompleted) {
-                  message += `\n🎉 恭喜完成目标！`;
+                  message += '\n' + i18nHelper.getMessage('congratsGoalComplete');
                 }
                 
                 notificationManager.showToast(message);

@@ -20,6 +20,7 @@
       "js": [
         "js/logger.js",
         "js/contextInvalidNotice.js",
+        "js/i18nHelper.js",
         "js/storage.js",
         "js/openaiIntegration.js",
         "js/siteDetector.js",

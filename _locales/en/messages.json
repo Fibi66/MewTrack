@@ -400,5 +400,134 @@
   },
   "loadFailed": {
     "message": "Load failed"
+  },
+  "catStageEgg": {
+    "message": "🥚 Egg"
+  },
+  "catStageKitten": {
+    "message": "🐱 Kitten"
+  },
+  "catStageBigCat": {
+    "message": "😸 Big Cat"
+  },
+  "catStageCatKing": {
+    "message": "👑 Cat King"
+  },
+  "catStageUnknown": {
+    "message": "Unknown"
+  },
+  "totalLearningStreak": {
+    "message": "Total learning streak"
+  },
+  "catGrowth": {
+    "message": "Cat growth"
+  },
+  "close": {
+    "message": "Close"
+  },
+  "laterBtn": {
+    "message": "Later"
+  },
+  "checkInTodayBtn": {
+    "message": "Check in today! 🎉"
+  },
+  "checkInSuccessMsg": {
+    "message": "Successfully checked in for {site}! Total streak: {days} days"
+  },
+  "targetProgressMsg": {
+    "message": "Target progress: {current}/{target} days ({percentage}%)"
+  },
+  "congratsGoalComplete": {
+    "message": "🎉 Congratulations on completing your goal!"
+  },
+  "motivation1": {
+    "message": "You're doing better than yesterday! Keep it up, the cat is proud of you! 🐱✨"
+  },
+  "motivation2": {
+    "message": "Learning makes me happy, growth makes me strong! You're becoming a better you! 🌟"
+  },
+  "motivation3": {
+    "message": "Every line of code is progress, every algorithm is growth! Programming cat gives you a thumbs up! 💻🐱"
+  },
+  "motivation4": {
+    "message": "Knowledge is power, learning is magic! You've mastered the secret of growth! 🔮"
+  },
+  "motivation5": {
+    "message": "Today's effort is tomorrow's harvest! Keep going, victory is ahead! 🏆"
+  },
+  "motivation6": {
+    "message": "You're not alone on the learning journey, the cat is with you! Let's get better together! 😸"
+  },
+  "motivation7": {
+    "message": "Every click is progress, every page is growth! You're amazing! 👏"
+  },
+  "motivation8": {
+    "message": "Knowledge changes destiny, learning changes life! You're writing your own legend! 📚✨"
+  },
+  "motivation9": {
+    "message": "Today you're smarter than yesterday, more hardworking than tomorrow! Keep it up! 💪"
+  },
+  "motivation10": {
+    "message": "Learning is a habit, excellence is a choice! You've chosen excellence! 🎯"
+  },
+  "streakDay1": {
+    "message": "Day one! The cat egg appears, a new learning journey begins! 🐣"
+  },
+  "streakDay10": {
+    "message": "Ten days of persistence, the cat has hatched! A cute kitten is looking forward to growing with you! 😸"
+  },
+  "streakDay30": {
+    "message": "Thirty days of persistence, the kitten has grown into a big cat! It looks more focused! Keep going! 😼"
+  },
+  "streakDay50": {
+    "message": "Fifty days! Your cat has become a keyboard master! This aura, it's definitely the Cat King! 👑🐱"
+  },
+  "streakDay100": {
+    "message": "One hundred days! The Cat God descends! Your perseverance is unmatched! 🐱✨"
+  },
+  "streakDay365": {
+    "message": "One year! You are the true God of Learning! Your cat has already written an operating system for you! 🎊"
+  },
+  "welcomeFirstTime": {
+    "message": "Welcome to {site}! This is your first time learning, the cat is cheering for you! 🐱✨"
+  },
+  "leetcodeMotiv1": {
+    "message": "Another algorithm problem solved today! Your logical thinking is getting stronger! 🧠"
+  },
+  "leetcodeMotiv2": {
+    "message": "LeetCode grinding, coding skills soaring! Keep it up! 💻"
+  },
+  "leetcodeMotiv3": {
+    "message": "Algorithms are nothing, you're smarter than algorithms! Awesome! 🎯"
+  },
+  "courseraMotiv1": {
+    "message": "Learning on Coursera, your knowledge is expanding! 📚"
+  },
+  "courseraMotiv2": {
+    "message": "Online courses are great, your learning ability is super strong! 🌟"
+  },
+  "courseraMotiv3": {
+    "message": "Coursera makes you a lifelong learner! Keep going! 🎓"
+  },
+  "youtubeMotiv1": {
+    "message": "YouTube learning videos are great, your self-learning ability is super strong! 📺"
+  },
+  "youtubeMotiv2": {
+    "message": "Video learning is also a skill, you've mastered it! 🎬"
+  },
+  "bilibiliMotiv1": {
+    "message": "Bilibili learning section is great, your learning enthusiasm is high! 📺"
+  },
+  "bilibiliMotiv2": {
+    "message": "Video learning is also a skill, you've mastered it! 🎬"
+  },
+  "githubMotiv1": {
+    "message": "Managing code on GitHub, your projects are getting better! 💻"
+  },
+  "githubMotiv2": {
+    "message": "Open source spirit is great, you're becoming an excellent developer! 🌟"
+  },
+  "githubMotiv3": {
+    "message": "Code repository managed well, keep it up! 📁"
   }
 }
