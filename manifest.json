@@ -25,7 +25,6 @@
         "js/checkInDialog.js",
         "js/motivation.js",
         "js/notification.js",
-        "js/debug-video.js",
         "content.js"
       ],
       "css": ["styles/notification.css"],
