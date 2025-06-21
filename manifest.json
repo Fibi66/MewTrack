@@ -51,7 +51,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["images/*", "styles/*"],
+      "resources": ["images/*", "styles/*", "_locales/*/messages.json"],
       "matches": ["<all_urls>"]
     }
   ]

@@ -208,5 +208,95 @@
   },
   "viewAllData": {
     "message": "查看所有数据"
+  },
+  "languageUpdated": {
+    "message": "语言设置已更新"
+  },
+  "languageUpdateFailed": {
+    "message": "语言切换失败"
+  },
+  "aiSmartDetection": {
+    "message": "🤖 AI智能识别"
+  },
+  "emptyHint": {
+    "message": "访问学习网站开始你的成长之旅吧！"
+  },
+  "loading": {
+    "message": "加载中..."
+  },
+  "globalGrowthStatus": {
+    "message": "总体成长状态"
+  },
+  "globalCat": {
+    "message": "总体猫猫"
+  },
+  "totalLearningRecord": {
+    "message": "总学习记录"
+  },
+  "globalStatsText": {
+    "message": "连续 {streak} 天 · 总计 {total} 天 · 今日已打卡 {today} 个网站"
+  },
+  "siteStatsText": {
+    "message": "连续 {streak} 天 · 总计 {total} 天"
+  },
+  "progressText": {
+    "message": "{current}/{target} 天 ({percentage}%)"
+  },
+  "completed": {
+    "message": "已完成"
+  },
+  "loadError": {
+    "message": "加载数据时出错，请刷新重试"
+  },
+  "errorMessage": {
+    "message": "错误信息"
+  },
+  "aiEnabled": {
+    "message": "已开启AI智能识别"
+  },
+  "aiDisabled": {
+    "message": "已关闭AI智能识别"
+  },
+  "settingSaveFailed": {
+    "message": "设置保存失败，请重试"
+  },
+  "pleaseEnterApiKey": {
+    "message": "请输入API密钥"
+  },
+  "invalidApiKeyFormat": {
+    "message": "API密钥格式不正确，应该以 sk- 开头"
+  },
+  "apiKeySaved": {
+    "message": "API密钥已保存成功！"
+  },
+  "saveFailed": {
+    "message": "保存失败"
+  },
+  "testingConnection": {
+    "message": "正在测试API连接..."
+  },
+  "pleaseSaveApiKeyFirst": {
+    "message": "请先保存API密钥"
+  },
+  "apiTestSuccess": {
+    "message": "API连接测试成功！密钥有效。"
+  },
+  "apiTestFailed": {
+    "message": "API测试失败"
+  },
+  "unknownError": {
+    "message": "未知错误"
+  },
+  "testFailed": {
+    "message": "测试失败"
+  },
+  "confirmDeleteApiKey": {
+    "message": "确定要删除API密钥吗？"
+  },
+  "apiKeyDeleted": {
+    "message": "API密钥已删除"
+  },
+  "deleteFailed": {
+    "message": "删除失败"
   }
 }

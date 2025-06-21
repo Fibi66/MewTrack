@@ -32,7 +32,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 语言切换事件
   languageToggle.addEventListener('change', async (e) => {
     const newLanguage = e.target.checked ? 'en' : 'zh_CN';
-    await i18n.setLanguage(newLanguage);
+    const success = await i18n.setLanguage(newLanguage);
+    if (success) {
+      showStatus(i18n.getMessage('languageUpdated') || 'Language settings updated', 'success');
+      // 重新加载自定义网站列表以应用新语言
+      await loadCustomSites();
+    } else {
+      showStatus(i18n.getMessage('languageUpdateFailed') || 'Language switch failed', 'error');
+      // 恢复开关状态
+      languageToggle.checked = !languageToggle.checked;
+    }
   });
 
   // 切换密码可见性
@@ -47,35 +56,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     const apiKey = apiKeyInput.value.trim();
     
     if (!apiKey) {
-      showStatus('请输入API密钥', 'error');
+      showStatus(i18n.getMessage('pleaseEnterApiKey'), 'error');
       return;
     }
 
     if (!apiKey.startsWith('sk-')) {
-      showStatus('API密钥格式不正确，应该以 sk- 开头', 'error');
+      showStatus(i18n.getMessage('invalidApiKeyFormat'), 'error');
       return;
     }
 
     try {
       await chrome.storage.local.set({ openaiApiKey: apiKey });
-      showStatus('API密钥已保存成功！', 'success');
+      showStatus(i18n.getMessage('apiKeySaved'), 'success');
       
       // 更新按钮状态
       removeApiKeyBtn.disabled = false;
       testApiKeyBtn.disabled = false;
     } catch (error) {
-      showStatus('保存失败：' + error.message, 'error');
+      showStatus(i18n.getMessage('saveFailed') + ': ' + error.message, 'error');
     }
   });
 
   // 测试API密钥
   testApiKeyBtn.addEventListener('click', async () => {
-    showStatus('正在测试API连接...', 'info');
+    showStatus(i18n.getMessage('testingConnection'), 'info');
     
     try {
       const data = await chrome.storage.local.get(['openaiApiKey']);
       if (!data.openaiApiKey) {
-        showStatus('请先保存API密钥', 'error');
+        showStatus(i18n.getMessage('pleaseSaveApiKeyFirst'), 'error');
         return;
       }
 
@@ -94,29 +103,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showStatus('API连接测试成功！密钥有效。', 'success');
+        showStatus(i18n.getMessage('apiTestSuccess'), 'success');
       } else {
         const error = await response.json();
-        showStatus(`API测试失败：${error.error?.message || '未知错误'}`, 'error');
+        showStatus(i18n.getMessage('apiTestFailed') + ': ' + (error.error?.message || i18n.getMessage('unknownError')), 'error');
       }
     } catch (error) {
-      showStatus('测试失败：' + error.message, 'error');
+      showStatus(i18n.getMessage('testFailed') + ': ' + error.message, 'error');
     }
   });
 
   // 删除API密钥
   removeApiKeyBtn.addEventListener('click', async () => {
-    if (confirm('确定要删除API密钥吗？')) {
+    if (confirm(i18n.getMessage('confirmDeleteApiKey'))) {
       try {
         await chrome.storage.local.remove(['openaiApiKey']);
         apiKeyInput.value = '';
-        showStatus('API密钥已删除', 'success');
+        showStatus(i18n.getMessage('apiKeyDeleted'), 'success');
         
         // 更新按钮状态
         removeApiKeyBtn.disabled = true;
         testApiKeyBtn.disabled = true;
       } catch (error) {
-        showStatus('删除失败：' + error.message, 'error');
+        showStatus(i18n.getMessage('deleteFailed') + ': ' + error.message, 'error');
       }
     }
   });

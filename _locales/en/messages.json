@@ -208,5 +208,95 @@
   },
   "viewAllData": {
     "message": "View All Data"
+  },
+  "languageUpdated": {
+    "message": "Language settings updated"
+  },
+  "languageUpdateFailed": {
+    "message": "Language switch failed"
+  },
+  "aiSmartDetection": {
+    "message": "🤖 AI Smart Detection"
+  },
+  "emptyHint": {
+    "message": "Visit learning websites to start your growth journey!"
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "globalGrowthStatus": {
+    "message": "Overall Growth Status"
+  },
+  "globalCat": {
+    "message": "Overall Cat"
+  },
+  "totalLearningRecord": {
+    "message": "Total Learning Record"
+  },
+  "globalStatsText": {
+    "message": "Streak {streak} days · Total {total} days · Today checked in {today} sites"
+  },
+  "siteStatsText": {
+    "message": "Streak {streak} days · Total {total} days"
+  },
+  "progressText": {
+    "message": "{current}/{target} days ({percentage}%)"
+  },
+  "completed": {
+    "message": "Completed"
+  },
+  "loadError": {
+    "message": "Error loading data, please refresh and try again"
+  },
+  "errorMessage": {
+    "message": "Error message"
+  },
+  "aiEnabled": {
+    "message": "AI Smart Detection enabled"
+  },
+  "aiDisabled": {
+    "message": "AI Smart Detection disabled"
+  },
+  "settingSaveFailed": {
+    "message": "Failed to save settings, please try again"
+  },
+  "pleaseEnterApiKey": {
+    "message": "Please enter API key"
+  },
+  "invalidApiKeyFormat": {
+    "message": "Invalid API key format, should start with sk-"
+  },
+  "apiKeySaved": {
+    "message": "API key saved successfully!"
+  },
+  "saveFailed": {
+    "message": "Save failed"
+  },
+  "testingConnection": {
+    "message": "Testing API connection..."
+  },
+  "pleaseSaveApiKeyFirst": {
+    "message": "Please save API key first"
+  },
+  "apiTestSuccess": {
+    "message": "API connection test successful! Key is valid."
+  },
+  "apiTestFailed": {
+    "message": "API test failed"
+  },
+  "unknownError": {
+    "message": "Unknown error"
+  },
+  "testFailed": {
+    "message": "Test failed"
+  },
+  "confirmDeleteApiKey": {
+    "message": "Are you sure you want to delete the API key?"
+  },
+  "apiKeyDeleted": {
+    "message": "API key deleted"
+  },
+  "deleteFailed": {
+    "message": "Delete failed"
   }
 }

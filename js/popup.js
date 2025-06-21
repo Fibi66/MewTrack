@@ -130,15 +130,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const globalCatImage = getCatImage(globalStats.totalStreak);
         const globalCatHTML = `
           <div class="global-cat-section">
-            <h3>🐱 总体成长状态</h3>
+            <h3>🐱 ${i18n.getMessage('globalGrowthStatus')}</h3>
             <div class="site-item global-cat">
               <div class="cat-container">
-                <img src="${globalCatImage}" alt="总体猫猫" class="cat-image">
+                <img src="${globalCatImage}" alt="${i18n.getMessage('globalCat')}" class="cat-image">
               </div>
               <div class="site-info">
-                <div class="site-name">总学习记录</div>
+                <div class="site-name">${i18n.getMessage('totalLearningRecord')}</div>
                 <div class="site-stats">
-                  连续 ${globalStats.totalStreak} 天 · 总计 ${globalStats.totalDays} 天 · 今日已打卡 ${stats.checkedSitesToday} 个网站
+                  ${i18n.format('globalStatsText', {
+                    streak: globalStats.totalStreak,
+                    total: globalStats.totalDays,
+                    today: stats.checkedSitesToday
+                  })}
                 </div>
               </div>
               <span class="streak-badge global-badge">${globalStats.totalStreak}</span>
@@ -161,8 +165,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <div class="progress-fill" style="width: ${progress.percentage}%"></div>
                 </div>
                 <div class="progress-text">
-                  ${progress.current}/${progress.target} 天 (${progress.percentage}%)
-                  ${progress.isCompleted ? '<span class="completed">✓ 已完成</span>' : ''}
+                  ${i18n.format('progressText', {
+                    current: progress.current,
+                    target: progress.target,
+                    percentage: progress.percentage
+                  })}
+                  ${progress.isCompleted ? `<span class="completed">✓ ${i18n.getMessage('completed')}</span>` : ''}
                 </div>
               </div>
             `;
@@ -176,7 +184,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="site-info">
                 <div class="site-name">${siteInfo.name}</div>
                 <div class="site-stats">
-                  连续 ${siteData.streak} 天 · 总计 ${siteData.totalDays} 天
+                  ${i18n.format('siteStatsText', {
+                    streak: siteData.streak,
+                    total: siteData.totalDays
+                  })}
                 </div>
                 ${progressHTML}
               </div>
@@ -191,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (typeof logger !== 'undefined') {
         logger.error('渲染错误:', error);
       }
-      sitesListEl.innerHTML = '<div class="error-message">加载数据时出错，请刷新重试<br/>错误信息: ' + error.message + '</div>';
+      sitesListEl.innerHTML = `<div class="error-message">${i18n.getMessage('loadError')}<br/>${i18n.getMessage('errorMessage')}: ${error.message}</div>`;
     }
 
     hideLoading();
@@ -260,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await storage.setAIContentDetectionSetting(enabled);
       
       // 显示状态提示
-      const statusText = enabled ? '已开启AI智能识别' : '已关闭AI智能识别';
+      const statusText = enabled ? i18n.getMessage('aiEnabled') : i18n.getMessage('aiDisabled');
       if (typeof logger !== 'undefined') {
         logger.info(statusText);
       }
@@ -273,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       // 如果保存失败，恢复开关状态
       e.target.checked = !e.target.checked;
-      showToast('设置保存失败，请重试', 'error');
+      showToast(i18n.getMessage('settingSaveFailed'), 'error');
     }
   });
 
