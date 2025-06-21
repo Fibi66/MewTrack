@@ -13,7 +13,8 @@ class MewTrackStorage {
       },
       settings: {
         notifications: true,
-        autoDetect: true
+        autoDetect: true,
+        aiContentDetection: true  // AI自动识别内容开关
       },
       customSites: {} // 用户自定义的网站
     };
@@ -440,6 +441,23 @@ class MewTrackStorage {
     }
     
     return false;
+  }
+
+  // 获取AI内容检测设置
+  async getAIContentDetectionSetting() {
+    const data = await this.getAllData();
+    return data.settings?.aiContentDetection !== false; // 默认为true
+  }
+
+  // 设置AI内容检测开关
+  async setAIContentDetectionSetting(enabled) {
+    const data = await this.getAllData();
+    if (!data.settings) {
+      data.settings = {};
+    }
+    data.settings.aiContentDetection = enabled;
+    await this.saveAllData(data);
+    return true;
   }
 }
 

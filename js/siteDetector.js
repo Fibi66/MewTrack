@@ -150,19 +150,51 @@ class SiteDetector {
 
   // 获取当前网站的域名
   getCurrentDomain() {
-    return window.location.hostname.toLowerCase();
+    try {
+      const hostname = window.location.hostname;
+      if (typeof hostname === 'string' && hostname.trim()) {
+        return hostname.toLowerCase().trim();
+      } else {
+        if (typeof logger !== 'undefined') {
+          logger.error('获取域名失败，hostname为空或非字符串:', hostname);
+        }
+        return '';
+      }
+    } catch (error) {
+      if (typeof logger !== 'undefined') {
+        logger.error('获取当前域名时发生错误:', error);
+      }
+      return '';
+    }
   }
 
   // 检查域名是否匹配（支持子域名）
   isDomainMatch(currentDomain, targetDomain) {
+    // 类型检查：确保两个参数都是字符串
+    if (typeof currentDomain !== 'string' || typeof targetDomain !== 'string') {
+      if (typeof logger !== 'undefined') {
+        logger.error('isDomainMatch参数类型错误:', {
+          currentDomain: typeof currentDomain,
+          currentDomainValue: currentDomain,
+          targetDomain: typeof targetDomain,
+          targetDomainValue: targetDomain
+        });
+      }
+      return false;
+    }
+
+    // 转换为小写进行比较
+    const current = currentDomain.toLowerCase();
+    const target = targetDomain.toLowerCase();
+    
     // 完全匹配
-    if (currentDomain === targetDomain) return true;
+    if (current === target) return true;
     
     // 检查是否为子域名（如 www.youtube.com 匹配 youtube.com）
-    if (currentDomain.endsWith('.' + targetDomain)) return true;
+    if (current.endsWith('.' + target)) return true;
     
     // 检查是否为主域名（如 youtube.com 匹配 www.youtube.com）
-    if (targetDomain.endsWith('.' + currentDomain)) return true;
+    if (target.endsWith('.' + current)) return true;
     
     return false;
   }
@@ -171,26 +203,45 @@ class SiteDetector {
   async isLearningSite(domain = null) {
     const currentDomain = domain || this.getCurrentDomain();
     
+    // 确保当前域名有效
+    if (!currentDomain || typeof currentDomain !== 'string') {
+      if (typeof logger !== 'undefined') {
+        logger.error('当前域名无效:', currentDomain);
+      }
+      return false;
+    }
+    
     // 检查预定义的学习网站
     for (const configDomain of Object.keys(this.learningSites)) {
-      if (this.isDomainMatch(currentDomain, configDomain)) {
+      if (typeof configDomain === 'string' && this.isDomainMatch(currentDomain, configDomain)) {
         return true;
       }
     }
     
     // 检查内容检测网站
     for (const configDomain of Object.keys(this.contentDetectionSites)) {
-      if (this.isDomainMatch(currentDomain, configDomain)) {
+      if (typeof configDomain === 'string' && this.isDomainMatch(currentDomain, configDomain)) {
         return true;
       }
     }
     
     // 检查用户自定义网站
     if (typeof mewTrackStorage !== 'undefined') {
-      const customSites = await mewTrackStorage.getCustomSites();
-      for (const customDomain of Object.keys(customSites)) {
-        if (customSites[customDomain].enabled && this.isDomainMatch(currentDomain, customDomain)) {
-          return true;
+      try {
+        const customSites = await mewTrackStorage.getCustomSites();
+        if (customSites && typeof customSites === 'object') {
+          for (const customDomain of Object.keys(customSites)) {
+            if (typeof customDomain === 'string' && 
+                customSites[customDomain] && 
+                customSites[customDomain].enabled && 
+                this.isDomainMatch(currentDomain, customDomain)) {
+              return true;
+            }
+          }
+        }
+      } catch (error) {
+        if (typeof logger !== 'undefined') {
+          logger.error('检查自定义网站时发生错误:', error);
         }
       }
     }
@@ -202,30 +253,49 @@ class SiteDetector {
   async getSiteInfo(domain = null) {
     const currentDomain = domain || this.getCurrentDomain();
     
+    // 确保当前域名有效
+    if (!currentDomain || typeof currentDomain !== 'string') {
+      if (typeof logger !== 'undefined') {
+        logger.error('getSiteInfo: 当前域名无效:', currentDomain);
+      }
+      return null;
+    }
+    
     // 先检查预定义网站
     for (const [siteDomain, siteInfo] of Object.entries(this.learningSites)) {
-      if (this.isDomainMatch(currentDomain, siteDomain)) {
+      if (typeof siteDomain === 'string' && this.isDomainMatch(currentDomain, siteDomain)) {
         return siteInfo;
       }
     }
     
     for (const [siteDomain, siteInfo] of Object.entries(this.contentDetectionSites)) {
-      if (this.isDomainMatch(currentDomain, siteDomain)) {
+      if (typeof siteDomain === 'string' && this.isDomainMatch(currentDomain, siteDomain)) {
         return siteInfo;
       }
     }
     
     // 再检查自定义网站
     if (typeof mewTrackStorage !== 'undefined') {
-      const customSites = await mewTrackStorage.getCustomSites();
-      for (const [siteDomain, siteConfig] of Object.entries(customSites)) {
-        if (this.isDomainMatch(currentDomain, [siteDomain])) {
-          return {
-            name: siteConfig.name,
-            type: 'custom',
-            alwaysLearning: true, // 自定义网站默认总是学习内容
-            keywords: []
-          };
+      try {
+        const customSites = await mewTrackStorage.getCustomSites();
+        if (customSites && typeof customSites === 'object') {
+          for (const [siteDomain, siteConfig] of Object.entries(customSites)) {
+            if (typeof siteDomain === 'string' && 
+                siteConfig && 
+                siteConfig.enabled && 
+                this.isDomainMatch(currentDomain, siteDomain)) {
+              return {
+                name: siteConfig.name || siteDomain,
+                type: 'custom',
+                alwaysLearning: true, // 自定义网站默认总是学习内容
+                keywords: []
+              };
+            }
+          }
+        }
+      } catch (error) {
+        if (typeof logger !== 'undefined') {
+          logger.error('getSiteInfo: 检查自定义网站时发生错误:', error);
         }
       }
     }
@@ -296,8 +366,23 @@ class SiteDetector {
       }
     }
     
-    // 首先尝试使用OpenAI API分析
-    if (typeof openAIIntegration !== 'undefined') {
+    // 检查AI识别设置
+    let aiEnabled = true;
+    if (typeof mewTrackStorage !== 'undefined') {
+      try {
+        aiEnabled = await mewTrackStorage.getAIContentDetectionSetting();
+        if (typeof logger !== 'undefined') {
+          logger.debug('AI内容检测设置:', aiEnabled ? '已开启' : '已关闭');
+        }
+      } catch (error) {
+        if (typeof logger !== 'undefined') {
+          logger.debug('获取AI设置失败，使用默认值:', error);
+        }
+      }
+    }
+
+    // 首先尝试使用OpenAI API分析（如果启用）
+    if (aiEnabled && typeof openAIIntegration !== 'undefined') {
       await openAIIntegration.init();
       if (typeof logger !== 'undefined') {
         logger.debug('OpenAI API密钥状态:', openAIIntegration.apiKey ? '已配置' : '未配置');
@@ -349,13 +434,20 @@ class SiteDetector {
           logger.debug('OpenAI API未配置，使用关键词匹配');
         }
       }
+    } else if (!aiEnabled) {
+      if (typeof logger !== 'undefined') {
+        logger.debug('AI识别已关闭，使用本地关键词匹配');
+      }
     } else {
       if (typeof logger !== 'undefined') {
-        logger.debug('OpenAI集成模块未加载');
+        logger.debug('OpenAI集成模块未加载，使用关键词匹配');
       }
     }
     
-    // 如果OpenAI API不可用或失败，使用增强的关键词匹配
+    // 使用本地关键词匹配算法
+    if (typeof logger !== 'undefined') {
+      logger.debug(aiEnabled ? '使用本地关键词匹配作为备选方案' : '使用本地关键词匹配');
+    }
     const content = `${title} ${description} ${tags}`.toLowerCase();
     
     // 计算学习关键词和娱乐关键词的匹配度

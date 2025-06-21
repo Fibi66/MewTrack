@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadingEl = document.getElementById('loading');
   const settingsBtn = document.getElementById('settingsBtn');
   const exportBtn = document.getElementById('exportBtn');
+  const aiToggle = document.getElementById('aiToggle');
 
   function showLoading() {
     loadingEl.classList.remove('hidden');
@@ -240,7 +241,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // 加载AI设置状态
+  async function loadAIToggleState() {
+    try {
+      const aiEnabled = await storage.getAIContentDetectionSetting();
+      aiToggle.checked = aiEnabled;
+    } catch (error) {
+      if (typeof logger !== 'undefined') {
+        logger.error('加载AI设置失败:', error);
+      }
+    }
+  }
+
+  // AI开关事件处理
+  aiToggle.addEventListener('change', async (e) => {
+    try {
+      const enabled = e.target.checked;
+      await storage.setAIContentDetectionSetting(enabled);
+      
+      // 显示状态提示
+      const statusText = enabled ? '已开启AI智能识别' : '已关闭AI智能识别';
+      if (typeof logger !== 'undefined') {
+        logger.info(statusText);
+      }
+      
+      // 可以在这里添加一个简单的Toast提示
+      showToast(statusText, enabled ? 'success' : 'info');
+    } catch (error) {
+      if (typeof logger !== 'undefined') {
+        logger.error('保存AI设置失败:', error);
+      }
+      // 如果保存失败，恢复开关状态
+      e.target.checked = !e.target.checked;
+      showToast('设置保存失败，请重试', 'error');
+    }
+  });
+
+  // 简单的Toast提示函数
+  function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      z-index: 10000;
+      transition: all 0.3s ease;
+      background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#667eea'};
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, 2000);
+  }
+
   // 初始化数据并渲染
   await initializeData();
+  await loadAIToggleState();
   await render();
 }); 
