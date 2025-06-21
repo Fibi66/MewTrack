@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "MewTrack - 猫猫成长追踪器",
+  "version": "1.2.0",
+  "description": "追踪你的学习成长，让可爱的猫猫陪伴你的每一天！",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "js/logger.js",
+        "js/contextInvalidNotice.js",
+        "js/storage.js",
+        "js/openaiIntegration.js",
+        "js/siteDetector.js",
+        "js/checkInDialog.js",
+        "js/motivation.js",
+        "js/notification.js",
+        "js/debug-video.js",
+        "content.js"
+      ],
+      "css": ["styles/notification.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "MewTrack - 查看你的学习进度",
+    "default_icon": {
+      "16": "icons/cat-16.png",
+      "32": "icons/cat-32.png",
+      "48": "icons/cat-48.png",
+      "128": "icons/cat-128.png"
+    }
+  },
+  "options_page": "settings.html",
+  "icons": {
+    "16": "icons/cat-16.png",
+    "32": "icons/cat-32.png",
+    "48": "icons/cat-48.png",
+    "128": "icons/cat-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*", "styles/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+} 

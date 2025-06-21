@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MewTrack YouTube检测测试</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #667eea;
+      text-align: center;
+    }
+    
+    .info-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .info-item {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      width: 150px;
+      color: #555;
+    }
+    
+    .info-value {
+      flex: 1;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    
+    .status-ok {
+      color: #28a745;
+    }
+    
+    .status-error {
+      color: #dc3545;
+    }
+    
+    .test-section {
+      margin: 30px 0;
+    }
+    
+    .test-link {
+      display: inline-block;
+      margin: 10px 0;
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    
+    .test-link:hover {
+      background: #5a6fd8;
+    }
+    
+    .instructions {
+      background: #e8f4fd;
+      border: 1px solid #b8daff;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    
+    .instructions h3 {
+      margin-top: 0;
+      color: #004085;
+    }
+    
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .instructions li {
+      margin: 5px 0;
+      color: #004085;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    button:hover {
+      background: #5a6fd8;
+    }
+    
+    .log-output {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🐱 MewTrack YouTube检测测试</h1>
+    
+    <div class="info-section">
+      <h2>当前状态</h2>
+      <div class="info-item">
+        <span class="info-label">当前域名:</span>
+        <span class="info-value" id="current-domain"></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">是否支持:</span>
+        <span class="info-value" id="is-supported"></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">OpenAI API:</span>
+        <span class="info-value" id="api-status"></span>
+      </div>
+    </div>
+    
+    <div class="instructions">
+      <h3>测试步骤</h3>
+      <ol>
+        <li>打开浏览器开发者工具 (F12)</li>
+        <li>切换到Console标签页</li>
+        <li>点击下面的测试链接</li>
+        <li>等待3-5秒让页面加载完成</li>
+        <li>观察Console中的MewTrack日志</li>
+        <li>检查是否出现打卡弹窗</li>
+      </ol>
+    </div>
+    
+    <div class="test-section">
+      <h2>YouTube测试链接</h2>
+      <p>学习类视频（应该弹窗）：</p>
+      <a href="https://www.youtube.com/watch?v=jNQXAC9IVRw" target="_blank" class="test-link">
+        Me at the zoo (第一个YouTube视频)
+      </a>
+      <br>
+      <a href="https://www.youtube.com/watch?v=RRKJiM9Njr8" target="_blank" class="test-link">
+        My Mix for Study
+      </a>
+      <br>
+      <a href="https://www.youtube.com/watch?v=K5KVEU3aaeQ" target="_blank" class="test-link">
+        您提供的视频链接
+      </a>
+      
+      <p>娱乐类视频（不应该弹窗）：</p>
+      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="test-link">
+        Rick Astley - Never Gonna Give You Up
+      </a>
+    </div>
+    
+    <div class="test-section">
+      <h2>调试工具</h2>
+      <button onclick="testDomainMatch()">测试域名匹配</button>
+      <button onclick="testSiteDetection()">测试网站检测</button>
+      <button onclick="clearTodayData()">清除今日打卡数据</button>
+      <button onclick="showStorageData()">查看存储数据</button>
+      
+      <div class="log-output" id="log"></div>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/openaiIntegration.js"></script>
+  <script src="js/siteDetector.js"></script>
+  
+  <script>
+    const logDiv = document.getElementById('log');
+    
+    function log(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.textContent += `[${timestamp}] ${message}\n`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    
+    // 初始化
+    async function init() {
+      // 显示当前域名
+      document.getElementById('current-domain').textContent = window.location.hostname;
+      
+      // 检查是否支持
+      const isSupported = await siteDetector.isLearningSite(window.location.hostname);
+      document.getElementById('is-supported').textContent = isSupported ? '是' : '否';
+      document.getElementById('is-supported').className = isSupported ? 'info-value status-ok' : 'info-value status-error';
+      
+      // 检查API状态
+      await openAIIntegration.init();
+      const apiStatus = openAIIntegration.apiKey ? '已配置' : '未配置';
+      document.getElementById('api-status').textContent = apiStatus;
+      document.getElementById('api-status').className = openAIIntegration.apiKey ? 'info-value status-ok' : 'info-value status-error';
+    }
+    
+    // 测试域名匹配
+    function testDomainMatch() {
+      log('=== 测试域名匹配 ===');
+      
+      const testCases = [
+        ['www.youtube.com', 'youtube.com'],
+        ['youtube.com', 'youtube.com'],
+        ['m.youtube.com', 'youtube.com'],
+        ['www.bilibili.com', 'bilibili.com'],
+        ['example.com', 'youtube.com']
+      ];
+      
+      testCases.forEach(([current, target]) => {
+        const matches = siteDetector.isDomainMatch(current, target);
+        log(`${current} vs ${target}: ${matches ? '✅ 匹配' : '❌ 不匹配'}`);
+      });
+    }
+    
+    // 测试网站检测
+    async function testSiteDetection() {
+      log('=== 测试网站检测 ===');
+      
+      const testDomains = ['youtube.com', 'www.youtube.com', 'bilibili.com', 'www.bilibili.com'];
+      
+      for (const domain of testDomains) {
+        const isLearning = await siteDetector.isLearningSite(domain);
+        const siteInfo = await siteDetector.getSiteInfo(domain);
+        log(`${domain}: ${isLearning ? '✅ 是学习网站' : '❌ 不是学习网站'}`);
+        if (siteInfo) {
+          log(`  - 名称: ${siteInfo.name}`);
+          log(`  - 类型: ${siteInfo.type}`);
+          log(`  - 总是学习: ${siteInfo.alwaysLearning ? '是' : '否'}`);
+        }
+      }
+    }
+    
+    // 清除今日数据
+    async function clearTodayData() {
+      if (confirm('确定要清除今日打卡数据吗？')) {
+        const storage = new MewTrackStorage();
+        const data = await storage.getAllData();
+        data.globalStats.checkedSitesToday = [];
+        await storage.saveAllData(data);
+        log('✅ 今日打卡数据已清除');
+      }
+    }
+    
+    // 显示存储数据
+    async function showStorageData() {
+      log('=== 存储数据 ===');
+      const storage = new MewTrackStorage();
+      const data = await storage.getAllData();
+      
+      log(`总打卡天数: ${data.globalStats.totalStreak}`);
+      log(`今日已打卡网站: ${data.globalStats.checkedSitesToday.join(', ') || '无'}`);
+      log(`网站记录数: ${Object.keys(data.sites).length}`);
+      
+      Object.entries(data.sites).forEach(([domain, siteData]) => {
+        log(`\n${domain}:`);
+        log(`  - 连续天数: ${siteData.streak}`);
+        log(`  - 总天数: ${siteData.totalDays}`);
+        log(`  - 最后访问: ${siteData.lastVisitDate || '从未'}`);
+      });
+    }
+    
+    // 页面加载完成后初始化
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MewTrack UI 预览</title>
+  <link rel="stylesheet" href="styles/popup.css">
+  <link rel="stylesheet" href="styles/notification.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .preview-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .preview-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .preview-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .preview-description {
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .ui-demo {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .popup-demo {
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .notification-demo {
+      position: relative;
+      margin: 20px;
+    }
+    .demo-label {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 10;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .feature-card {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    .feature-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .feature-desc {
+      color: #666;
+      font-size: 14px;
+    }
+    .color-palette {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .color-item {
+      text-align: center;
+    }
+    .color-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 2px solid #eee;
+    }
+    .color-label {
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <h1 style="text-align: center; color: #667eea; margin-bottom: 10px;">🐱 MewTrack UI 预览</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 40px;">猫猫成长追踪器 - 界面设计展示</p>
+
+    <!-- 主界面预览 -->
+    <div class="preview-section">
+      <div class="preview-title">📱 主界面 (Popup)</div>
+      <div class="preview-description">
+        点击Chrome插件图标时显示的主界面，包含总体猫猫成长状态、统计数据和网站列表。
+      </div>
+      <div class="ui-demo">
+        <div class="popup-demo">
+          <div class="demo-label">主界面</div>
+          <div class="popup-container">
+            <!-- 头部 -->
+            <div class="header">
+              <div class="logo">
+                <img src="icons/cat-48.png" alt="MewTrack" class="logo-img">
+                <h1>MewTrack</h1>
+              </div>
+              <p class="subtitle">猫猫成长追踪器</p>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="stats-section">
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-number">3</div>
+                  <div class="stat-label">追踪网站</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">2</div>
+                  <div class="stat-label">活跃网站</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">15</div>
+                  <div class="stat-label">总连续天数</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">20</div>
+                  <div class="stat-label">最长连续</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 网站列表 -->
+            <div class="sites-section">
+              <h2>我的学习网站</h2>
+              <div class="sites-list">
+                <!-- 总体猫猫成长状态 -->
+                <div class="global-cat-section">
+                  <h3>🐱 总体成长状态</h3>
+                  <div class="site-item global-cat">
+                    <div class="cat-container">
+                      <img src="images/cat-stage-2.png" alt="总体猫猫" class="cat-image">
+                    </div>
+                    <div class="site-info">
+                      <div class="site-name">总学习记录</div>
+                      <div class="site-stats">
+                        连续 15 天 · 总计 18 天 · 今日已打卡 2 个网站
+                      </div>
+                    </div>
+                    <span class="streak-badge global-badge">15</span>
+                  </div>
+                </div>
+                <div class="section-divider"></div>
+
+                <!-- 网站列表示例 -->
+                <div class="site-item">
+                  <div class="cat-container">
+                    <img src="images/cat-stage-2.png" alt="LeetCode" class="cat-image">
+                  </div>
+                  <div class="site-info">
+                    <div class="site-name">LeetCode</div>
+                    <div class="site-stats">连续 15 天 · 总计 18 天</div>
+                  </div>
+                  <span class="streak-badge">15</span>
+                </div>
+
+                <div class="site-item">
+                  <div class="cat-container">
+                    <img src="images/cat-stage-1.png" alt="Coursera" class="cat-image">
+                  </div>
+                  <div class="site-info">
+                    <div class="site-name">Coursera</div>
+                    <div class="site-stats">连续 8 天 · 总计 12 天</div>
+                  </div>
+                  <span class="streak-badge">8</span>
+                </div>
+
+                <div class="site-item inactive">
+                  <div class="cat-container">
+                    <img src="images/cat-stage-1.png" alt="哔哩哔哩" class="cat-image">
+                  </div>
+                  <div class="site-info">
+                    <div class="site-name">哔哩哔哩</div>
+                    <div class="site-stats">连续 5 天 · 总计 8 天</div>
+                  </div>
+                  <span class="streak-badge">5</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 底部操作 -->
+            <div class="footer">
+              <button class="btn btn-secondary">重置数据</button>
+              <button class="btn btn-primary">导出数据</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 打卡弹窗预览 -->
+    <div class="preview-section">
+      <div class="preview-title">🎉 打卡弹窗</div>
+      <div class="preview-description">
+        访问学习网站时显示的打卡确认弹窗，包含励志文案和猫猫成长预览。
+      </div>
+      <div class="ui-demo">
+        <div class="notification-demo">
+          <div class="demo-label">打卡弹窗</div>
+          <div class="mewtrack-notification show">
+            <div class="notification-content">
+              <div class="notification-header">
+                <div class="cat-avatar">
+                  <img src="images/cat-stage-2.png" alt="猫猫" class="cat-image">
+                </div>
+                <div class="site-info">
+                  <h3>LeetCode</h3>
+                  <p class="streak-info">总学习连续 14 天 → 15 天</p>
+                  <p class="cat-stage">猫猫成长: 😸 大猫猫</p>
+                </div>
+                <button class="close-btn">×</button>
+              </div>
+              <div class="notification-body">
+                <p class="motivation-text">🎯 太棒了！你已经连续学习14天了！每一行代码都是成长的见证，继续保持这个节奏，猫猫为你骄傲！💪</p>
+              </div>
+              <div class="notification-footer">
+                <button class="cancel-btn">以后再说</button>
+                <button class="confirm-btn">为今天打卡! 🎉</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 猫猫成长阶段 -->
+    <div class="preview-section">
+      <div class="preview-title">🐱 猫猫成长阶段</div>
+      <div class="preview-description">
+        根据总学习天数，猫猫会经历4个可爱的成长阶段。
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">🥚 蛋蛋阶段 (0天)</div>
+          <div class="feature-desc">刚开始学习的小蛋蛋，充满无限可能！</div>
+          <img src="images/cat-stage-0.png" alt="蛋蛋" style="width: 80px; height: 80px; margin-top: 10px; border-radius: 8px;">
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">🐱 小猫咪阶段 (1-9天)</div>
+          <div class="feature-desc">可爱的小猫咪诞生了，开始探索学习的世界！</div>
+          <img src="images/cat-stage-1.png" alt="小猫咪" style="width: 80px; height: 80px; margin-top: 10px; border-radius: 8px;">
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">😸 大猫猫阶段 (10-29天)</div>
+          <div class="feature-desc">成长中的大猫猫，学习能力越来越强！</div>
+          <img src="images/cat-stage-2.png" alt="大猫猫" style="width: 80px; height: 80px; margin-top: 10px; border-radius: 8px;">
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">👑 猫王阶段 (30天+)</div>
+          <div class="feature-desc">学习之王诞生！持续学习的终极形态！</div>
+          <img src="images/cat-stage-3.png" alt="猫王" style="width: 80px; height: 80px; margin-top: 10px; border-radius: 8px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- 设计特色 -->
+    <div class="preview-section">
+      <div class="preview-title">🎨 设计特色</div>
+      <div class="preview-description">
+        现代化的UI设计，渐变色彩和流畅动画，为学习体验增添乐趣。
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">🌈 渐变色彩</div>
+          <div class="feature-desc">使用紫蓝渐变主题色，营造现代科技感</div>
+          <div class="color-palette">
+            <div class="color-item">
+              <div class="color-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+              <div class="color-label">主渐变</div>
+            </div>
+            <div class="color-item">
+              <div class="color-box" style="background: #ffd700;"></div>
+              <div class="color-label">金色强调</div>
+            </div>
+            <div class="color-item">
+              <div class="color-box" style="background: #f8f9fa;"></div>
+              <div class="color-label">背景色</div>
+            </div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">📊 数据可视化</div>
+          <div class="feature-desc">清晰的统计卡片，一目了然的学习进度</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">🎭 状态指示</div>
+          <div class="feature-desc">活跃/非活跃状态用色彩和透明度区分</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">✨ 流畅动画</div>
+          <div class="feature-desc">悬停效果、滑入动画，提升交互体验</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 功能特点 -->
+    <div class="preview-section">
+      <div class="preview-title">⚡ 功能亮点</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">🎯 智能识别</div>
+          <div class="feature-desc">自动识别20+学习网站，智能区分学习内容和娱乐内容</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">📈 独立追踪</div>
+          <div class="feature-desc">每个网站独立计数，但共享总体成长记录</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">💾 本地存储</div>
+          <div class="feature-desc">数据安全存储在本地，支持导出备份</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">🔄 连续性管理</div>
+          <div class="feature-desc">中断时网站变灰但不重置，人性化设计</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 添加一些交互效果
+    document.addEventListener('DOMContentLoaded', function() {
+      // 为按钮添加点击效果
+      document.querySelectorAll('.btn, .confirm-btn, .cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          this.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            this.style.transform = 'scale(1)';
+          }, 150);
+        });
+      });
+
+      // 为网站项添加悬停效果
+      document.querySelectorAll('.site-item').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+          if (!this.classList.contains('global-cat')) {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.15)';
+          }
+        });
+        
+        item.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+          this.style.boxShadow = '';
+        });
+      });
+
+      console.log('🐱 MewTrack UI 预览已加载完成！');
+    });
+  </script>
+</body>
+</html> 

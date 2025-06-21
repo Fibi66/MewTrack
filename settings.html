@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MewTrack 设置</title>
+  <link rel="stylesheet" href="styles/settings.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="icons/cat-48.png" alt="MewTrack Logo" class="logo">
+      <h1>MewTrack 设置</h1>
+    </header>
+
+    <main>
+      <section class="settings-section">
+        <h2>OpenAI API 设置</h2>
+        <p class="description">
+          设置 OpenAI API 密钥后，MewTrack 可以更智能地识别网页内容是否为学习内容。
+        </p>
+        
+        <div class="form-group">
+          <label for="api-key">API 密钥:</label>
+          <div class="input-group">
+            <input 
+              type="password" 
+              id="api-key" 
+              placeholder="sk-..." 
+              class="api-key-input"
+            >
+            <button id="toggle-visibility" class="btn-icon">👁️</button>
+          </div>
+          <small class="help-text">
+            <a href="https://platform.openai.com/api-keys" target="_blank">获取 API 密钥</a>
+          </small>
+        </div>
+
+        <div class="button-group">
+          <button id="save-api-key" class="btn btn-primary">保存密钥</button>
+          <button id="test-api-key" class="btn btn-secondary">测试连接</button>
+          <button id="remove-api-key" class="btn btn-danger">删除密钥</button>
+        </div>
+
+        <div id="status-message" class="status-message"></div>
+      </section>
+
+      <section class="settings-section">
+        <h2>通知设置</h2>
+        
+        <div class="form-group">
+          <label class="switch">
+            <input type="checkbox" id="notifications-enabled" checked>
+            <span class="slider"></span>
+          </label>
+          <span>启用学习提醒通知</span>
+        </div>
+
+        <div class="form-group">
+          <label class="switch">
+            <input type="checkbox" id="auto-detect-enabled" checked>
+            <span class="slider"></span>
+          </label>
+          <span>自动检测学习内容</span>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>自定义网站管理</h2>
+        <p class="description">
+          添加您想要追踪的其他网站，每次访问时都会弹出打卡窗口。
+        </p>
+        
+        <div class="form-group">
+          <label for="custom-site-url">网站地址:</label>
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="custom-site-url" 
+              placeholder="例如: example.com 或 https://example.com" 
+              class="custom-site-input"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="custom-site-name">网站名称 (可选):</label>
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="custom-site-name" 
+              placeholder="例如: 我的学习网站" 
+              class="custom-site-input"
+            >
+          </div>
+        </div>
+
+        <button id="add-custom-site" class="btn btn-primary">添加网站</button>
+
+        <div class="custom-sites-list" id="custom-sites-list">
+          <h3>已添加的网站</h3>
+          <div id="custom-sites-container">
+            <!-- 自定义网站列表将在这里动态生成 -->
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>数据管理</h2>
+        
+        <div class="button-group">
+          <button id="export-data" class="btn btn-secondary">导出数据</button>
+          <button id="import-data" class="btn btn-secondary">导入数据</button>
+          <button id="reset-data" class="btn btn-danger">重置所有数据</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>MewTrack v1.2.0 - 让猫猫陪伴你的学习之旅 🐱</p>
+    </footer>
+  </div>
+
+  <script src="js/logger.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MewTrack - 猫猫成长追踪器</title>
+  <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- 头部 -->
+    <div class="header">
+      <div class="logo">
+        <img src="icons/cat-48.png" alt="MewTrack" class="logo-img">
+        <h1>MewTrack</h1>
+      </div>
+      <p class="subtitle">猫猫成长追踪器</p>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number" id="totalSites">0</div>
+          <div class="stat-label">追踪网站</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="activeSites">0</div>
+          <div class="stat-label">活跃网站</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="totalStreak">0</div>
+          <div class="stat-label">总连续天数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="maxStreak">0</div>
+          <div class="stat-label">最长连续</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 网站列表 -->
+    <div class="sites-section">
+      <h2>我的学习网站</h2>
+      <div class="sites-list" id="sitesList">
+        <!-- 网站列表将通过 JavaScript 动态生成 -->
+      </div>
+      
+      <!-- 空状态 -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🐱</div>
+        <p>还没有学习记录</p>
+        <p class="empty-hint">访问学习网站开始你的成长之旅吧！</p>
+      </div>
+    </div>
+
+    <!-- 底部操作 -->
+    <div class="footer">
+      <button class="btn btn-secondary" id="settingsBtn">设置</button>
+      <button class="btn btn-primary" id="exportBtn">导出数据</button>
+    </div>
+  </div>
+
+  <!-- 加载状态 -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>加载中...</p>
+  </div>
+
+  <script src="js/logger.js"></script>
+  <script src="js/loggerConfig.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/siteDetector.js"></script>
+  <script src="js/motivation.js"></script>
+  <script src="js/notification.js"></script>
+  <script src="js/popup.js"></script>
+</body>
+</html> 
