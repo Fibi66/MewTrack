@@ -298,5 +298,65 @@
   },
   "deleteFailed": {
     "message": "Delete failed"
+  },
+  "notificationSettingUpdated": {
+    "message": "Notification settings updated"
+  },
+  "saveSettingsFailed": {
+    "message": "Failed to save settings"
+  },
+  "autoDetectSettingUpdated": {
+    "message": "Auto-detect settings updated"
+  },
+  "dataExportSuccess": {
+    "message": "Data exported successfully"
+  },
+  "exportFailed": {
+    "message": "Export failed"
+  },
+  "confirmImportData": {
+    "message": "Importing data will overwrite existing data. Are you sure you want to continue?"
+  },
+  "dataImportSuccess": {
+    "message": "Data imported successfully"
+  },
+  "importFailed": {
+    "message": "Import failed"
+  },
+  "confirmResetData": {
+    "message": "Are you sure you want to reset all data? This action cannot be undone!"
+  },
+  "allDataReset": {
+    "message": "All data has been reset"
+  },
+  "resetFailed": {
+    "message": "Reset failed"
+  },
+  "pleaseEnterSiteUrl": {
+    "message": "Please enter site URL"
+  },
+  "siteAddedSuccess": {
+    "message": "Site added successfully!"
+  },
+  "addFailed": {
+    "message": "Add failed"
+  },
+  "enabled": {
+    "message": "enabled"
+  },
+  "disabled": {
+    "message": "disabled"
+  },
+  "siteToggleSuccess": {
+    "message": "Site {action} successfully"
+  },
+  "confirmDeleteSite": {
+    "message": "Are you sure you want to delete {name}?"
+  },
+  "siteDeleted": {
+    "message": "Site deleted"
+  },
+  "loadFailed": {
+    "message": "Load failed"
   }
 }

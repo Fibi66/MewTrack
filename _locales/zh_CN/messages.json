@@ -298,5 +298,65 @@
   },
   "deleteFailed": {
     "message": "删除失败"
+  },
+  "notificationSettingUpdated": {
+    "message": "通知设置已更新"
+  },
+  "saveSettingsFailed": {
+    "message": "保存设置失败"
+  },
+  "autoDetectSettingUpdated": {
+    "message": "自动检测设置已更新"
+  },
+  "dataExportSuccess": {
+    "message": "数据导出成功"
+  },
+  "exportFailed": {
+    "message": "导出失败"
+  },
+  "confirmImportData": {
+    "message": "导入数据将覆盖现有数据，确定要继续吗？"
+  },
+  "dataImportSuccess": {
+    "message": "数据导入成功"
+  },
+  "importFailed": {
+    "message": "导入失败"
+  },
+  "confirmResetData": {
+    "message": "确定要重置所有数据吗？此操作不可撤销！"
+  },
+  "allDataReset": {
+    "message": "所有数据已重置"
+  },
+  "resetFailed": {
+    "message": "重置失败"
+  },
+  "pleaseEnterSiteUrl": {
+    "message": "请输入网站地址"
+  },
+  "siteAddedSuccess": {
+    "message": "网站添加成功！"
+  },
+  "addFailed": {
+    "message": "添加失败"
+  },
+  "enabled": {
+    "message": "启用"
+  },
+  "disabled": {
+    "message": "禁用"
+  },
+  "siteToggleSuccess": {
+    "message": "网站{action}成功"
+  },
+  "confirmDeleteSite": {
+    "message": "确定要删除 {name} 吗？"
+  },
+  "siteDeleted": {
+    "message": "网站已删除"
+  },
+  "loadFailed": {
+    "message": "加载失败"
   }
 }

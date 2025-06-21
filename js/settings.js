@@ -143,9 +143,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       mewtrackData.settings.notifications = notificationsEnabled.checked;
       await chrome.storage.local.set({ mewtrack_data: mewtrackData });
       
-      showStatus('通知设置已更新', 'success');
+      showStatus(i18n.getMessage('notificationSettingUpdated'), 'success');
     } catch (error) {
-      showStatus('保存设置失败：' + error.message, 'error');
+      showStatus(i18n.getMessage('saveSettingsFailed') + ': ' + error.message, 'error');
     }
   });
 
@@ -162,9 +162,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       mewtrackData.settings.autoDetect = autoDetectEnabled.checked;
       await chrome.storage.local.set({ mewtrack_data: mewtrackData });
       
-      showStatus('自动检测设置已更新', 'success');
+      showStatus(i18n.getMessage('autoDetectSettingUpdated'), 'success');
     } catch (error) {
-      showStatus('保存设置失败：' + error.message, 'error');
+      showStatus(i18n.getMessage('saveSettingsFailed') + ': ' + error.message, 'error');
     }
   });
 
@@ -183,9 +183,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       a.click();
       
       URL.revokeObjectURL(url);
-      showStatus('数据导出成功', 'success');
+      showStatus(i18n.getMessage('dataExportSuccess'), 'success');
     } catch (error) {
-      showStatus('导出失败：' + error.message, 'error');
+      showStatus(i18n.getMessage('exportFailed') + ': ' + error.message, 'error');
     }
   });
 
@@ -203,15 +203,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const text = await file.text();
         const data = JSON.parse(text);
         
-        if (confirm('导入数据将覆盖现有数据，确定要继续吗？')) {
+        if (confirm(i18n.getMessage('confirmImportData'))) {
           await chrome.storage.local.set(data);
-          showStatus('数据导入成功', 'success');
+          showStatus(i18n.getMessage('dataImportSuccess'), 'success');
           
           // 重新加载设置
           await loadSettings();
         }
       } catch (error) {
-        showStatus('导入失败：' + error.message, 'error');
+        showStatus(i18n.getMessage('importFailed') + ': ' + error.message, 'error');
       }
     });
     
@@ -220,22 +220,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 重置所有数据
   resetDataBtn.addEventListener('click', async () => {
-    if (confirm('确定要重置所有数据吗？此操作不可撤销！')) {
-      if (confirm('再次确认：真的要删除所有学习记录和设置吗？')) {
-        try {
-          await chrome.storage.local.clear();
-          showStatus('所有数据已重置', 'success');
-          
-          // 重新加载设置
-          apiKeyInput.value = '';
-          notificationsEnabled.checked = true;
-          autoDetectEnabled.checked = true;
-          removeApiKeyBtn.disabled = true;
-          testApiKeyBtn.disabled = true;
-          await loadCustomSites();
-        } catch (error) {
-          showStatus('重置失败：' + error.message, 'error');
-        }
+    if (confirm(i18n.getMessage('confirmResetData'))) {
+      try {
+        await chrome.storage.local.clear();
+        showStatus(i18n.getMessage('allDataReset'), 'success');
+        
+        // 重新加载设置
+        apiKeyInput.value = '';
+        notificationsEnabled.checked = true;
+        autoDetectEnabled.checked = true;
+        removeApiKeyBtn.disabled = true;
+        testApiKeyBtn.disabled = true;
+        await loadCustomSites();
+      } catch (error) {
+        showStatus(i18n.getMessage('resetFailed') + ': ' + error.message, 'error');
       }
     }
   });
@@ -246,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const name = customSiteNameInput.value.trim();
     
     if (!url) {
-      showStatus('请输入网站地址', 'error');
+      showStatus(i18n.getMessage('pleaseEnterSiteUrl'), 'error');
       return;
     }
     
@@ -255,7 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await storage.addCustomSite(url, name);
       
       if (result.success) {
-        showStatus('网站添加成功！', 'success');
+        showStatus(i18n.getMessage('siteAddedSuccess'), 'success');
         customSiteUrlInput.value = '';
         customSiteNameInput.value = '';
         await loadCustomSites();
@@ -265,10 +263,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           logger.info(`提示：需要在manifest.json中添加 ${result.domain} 的权限`);
         }
       } else {
-        showStatus(result.error || '添加失败', 'error');
+        showStatus(result.error || i18n.getMessage('addFailed'), 'error');
       }
     } catch (error) {
-      showStatus('添加失败：' + error.message, 'error');
+      showStatus(i18n.getMessage('addFailed') + ': ' + error.message, 'error');
     }
   });
 
@@ -306,16 +304,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         checkbox.addEventListener('change', async (e) => {
           const domain = e.target.dataset.domain;
           await storage.toggleCustomSite(domain, e.target.checked);
-          showStatus(`网站${e.target.checked ? '启用' : '禁用'}成功`, 'success');
+          showStatus(i18n.format('siteToggleSuccess', {
+            action: e.target.checked ? i18n.getMessage('enabled') : i18n.getMessage('disabled')
+          }), 'success');
         });
       });
       
       customSitesContainer.querySelectorAll('.btn-remove').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const domain = e.target.dataset.domain;
-          if (confirm(`确定要删除 ${customSites[domain].name} 吗？`)) {
+          if (confirm(i18n.format('confirmDeleteSite', { name: customSites[domain].name }))) {
             await storage.removeCustomSite(domain);
-            showStatus('网站已删除', 'success');
+            showStatus(i18n.getMessage('siteDeleted'), 'success');
             await loadCustomSites();
           }
         });
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (typeof logger !== 'undefined') {
         logger.error('加载自定义网站失败:', error);
       }
-      customSitesContainer.innerHTML = '<div class="empty-custom-sites">加载失败</div>';
+      customSitesContainer.innerHTML = `<div class="empty-custom-sites">${i18n.getMessage('loadFailed')}</div>`;
     }
   }
 
