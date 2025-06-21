@@ -60,6 +60,38 @@
       </section>
 
       <section class="settings-section">
+        <h2>DeepSeek API</h2>
+        <p class="description">
+          <span data-i18n="deepseekApiDescription">DeepSeek 是 OpenAI 的替代方案，同样可以智能识别学习内容。</span>
+        </p>
+        
+        <div class="form-group">
+          <label for="deepseek-api-key" data-i18n="deepseekApiKeyLabel">API 密钥:</label>
+          <div class="input-group">
+            <input 
+              type="password" 
+              id="deepseek-api-key" 
+              placeholder="sk-..." 
+              class="api-key-input"
+              data-i18n="deepseekApiKeyPlaceholder"
+            >
+            <button id="toggle-deepseek-visibility" class="btn-icon">👁️</button>
+          </div>
+          <small class="help-text">
+            <a href="https://platform.deepseek.com/api_keys" target="_blank" data-i18n="getDeepseekApiKey">获取 DeepSeek API 密钥</a>
+          </small>
+        </div>
+
+        <div class="button-group">
+          <button id="save-deepseek-api-key" class="btn btn-primary" data-i18n="saveApiKey">保存密钥</button>
+          <button id="test-deepseek-api-key" class="btn btn-secondary" data-i18n="testConnection">测试连接</button>
+          <button id="remove-deepseek-api-key" class="btn btn-danger" data-i18n="deleteApiKey">删除密钥</button>
+        </div>
+
+        <div id="deepseek-status-message" class="status-message"></div>
+      </section>
+
+      <section class="settings-section">
         <h2 data-i18n="notificationSettings">通知设置</h2>
         
         <div class="form-group">

@@ -113,6 +113,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       totalStreakEl.textContent = stats.totalStreak;
 
       const sitesData = await storage.getAllSitesData();
+      
+      if (typeof logger !== 'undefined') {
+        logger.debug('所有网站数据:', sitesData);
+        logger.debug('YouTube数据:', sitesData['youtube.com']);
+        logger.debug('www.youtube.com数据:', sitesData['www.youtube.com']);
+      }
+      
       const sites = Object.entries(sitesData);
 
       if (sites.length === 0) {

@@ -113,12 +113,13 @@ class SiteDetector {
       }
     };
 
-    // 需要内容检测的网站（娱乐性网站）
+    // 需要内容检测的网站（但仍然会显示打卡界面）
     this.contentDetectionSites = {
       'youtube.com': {
         name: 'YouTube',
         type: 'video',
-        alwaysLearning: false,
+        alwaysLearning: true, // 改为true，确保始终显示打卡界面
+        needsContentDetection: true, // 新增标记，表示需要AI检测内容
         learningKeywords: [
           '教程', '教学', '学习', '编程', '算法', '数据结构', '课程', '培训',
           'tutorial', 'learn', 'programming', 'algorithm', 'course', 'education',
@@ -134,7 +135,8 @@ class SiteDetector {
       'bilibili.com': {
         name: '哔哩哔哩',
         type: 'video',
-        alwaysLearning: false,
+        alwaysLearning: true, // 改为true
+        needsContentDetection: true, // 新增标记
         learningKeywords: [
           '教程', '教学', '学习', '编程', '算法', '数据结构', '课程', '培训',
           '技术', '科普', '知识', '教育', '学术', '研究', '实验', '理论',
@@ -458,8 +460,9 @@ class SiteDetector {
       logger.debug('关键词匹配得分 - 学习:', learningScore, '娱乐:', entertainmentScore);
     }
     
-    // 调整判断逻辑：学习内容需要有明确的学习关键词，且学习得分要高于娱乐得分
-    return learningScore >= 2 && learningScore > entertainmentScore;
+    // 调整判断逻辑：学习内容需要有学习关键词，且学习得分要高于或等于娱乐得分
+    // 降低阈值，让更多教育内容能被识别
+    return learningScore >= 1 && learningScore >= entertainmentScore;
   }
 
   // 获取视频标题

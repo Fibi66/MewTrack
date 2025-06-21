@@ -11,16 +11,16 @@ class CheckInDialog {
       <div class="mewtrack-checkin-dialog-overlay">
         <div class="mewtrack-checkin-dialog">
           <div class="mewtrack-dialog-header">
-            <img src="${chrome.runtime.getURL('images/cat-stage-2.png')}" alt="猫猫" class="mewtrack-dialog-cat">
-            <h2>发现学习内容！</h2>
+            <img src="${chrome.runtime.getURL('images/cat-stage-2.png')}" alt="${chrome.i18n.getMessage('catAlt') || '猫猫'}" class="mewtrack-dialog-cat">
+            <h2>${chrome.i18n.getMessage('learningDetected') || '发现学习内容！'}</h2>
           </div>
           
           <div class="mewtrack-dialog-content">
-            <p>检测到您正在 <strong>${siteName}</strong> 学习</p>
-            <p class="mewtrack-dialog-question">要为这个网站创建打卡计划吗？</p>
+            <p>${chrome.i18n.getMessage('detectedLearningAt') || '检测到您正在学习'} <strong>${siteName}</strong></p>
+            <p class="mewtrack-dialog-question">${chrome.i18n.getMessage('createCheckInPlan') || '要为这个网站创建打卡计划吗？'}</p>
             
             <div class="mewtrack-target-days">
-              <label for="mewtrack-target-days-input">目标打卡天数：</label>
+              <label for="mewtrack-target-days-input">${chrome.i18n.getMessage('targetCheckInDays') || '目标打卡天数'}:</label>
               <input 
                 type="number" 
                 id="mewtrack-target-days-input" 
@@ -29,21 +29,21 @@ class CheckInDialog {
                 value="30" 
                 class="mewtrack-days-input"
               >
-              <span>天</span>
+              <span>${chrome.i18n.getMessage('days') || '天'}</span>
             </div>
             
             <div class="mewtrack-dialog-tips">
-              <p>💡 设置目标，猫猫陪您学习</p>
-              <p>🎯 连续打卡让猫猫成长</p>
+              <p>💡 ${chrome.i18n.getMessage('setGoalTip') || '设置目标，猫猫陪您学习'}</p>
+              <p>🎯 ${chrome.i18n.getMessage('continuousCheckInTip') || '连续打卡让猫猫成长'}</p>
             </div>
           </div>
           
           <div class="mewtrack-dialog-actions">
             <button class="mewtrack-btn mewtrack-btn-cancel" id="mewtrack-cancel-btn">
-              跳过
+              ${chrome.i18n.getMessage('skip') || '跳过'}
             </button>
             <button class="mewtrack-btn mewtrack-btn-confirm" id="mewtrack-confirm-btn">
-              创建计划
+              ${chrome.i18n.getMessage('createPlan') || '创建计划'}
             </button>
           </div>
         </div>
@@ -290,7 +290,9 @@ class CheckInDialog {
       await mewTrackStorage.setTargetDays(domain, targetDays);
       
       // 显示成功提示
-      notificationManager.showToast(`已为该网站设置 ${targetDays} 天的打卡目标！加油！🎯`);
+      const targetSetMessage = chrome.i18n.getMessage('targetSetSuccess') || 
+        `已为该网站设置 ${targetDays} 天的打卡目标！加油！🎯`;
+      notificationManager.showToast(targetSetMessage.replace('{days}', targetDays));
       
       this.close();
       
@@ -298,8 +300,13 @@ class CheckInDialog {
       const result = await mewTrackStorage.updateSiteVisit(domain, true);
       if (result.isNewVisit) {
         const siteInfo = await siteDetector.getSiteInfo(domain);
-        const message = `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
-        notificationManager.showToast(message);
+        const message = chrome.i18n.getMessage('checkInSuccess') || 
+          `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
+        // 替换占位符
+        const formattedMessage = message
+          .replace('{site}', siteInfo.name)
+          .replace('{days}', result.globalStats.totalStreak);
+        notificationManager.showToast(formattedMessage);
       }
     });
 

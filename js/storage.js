@@ -2,6 +2,7 @@
 class MewTrackStorage {
   constructor() {
     this.storageKey = 'mewtrack_data';
+    this.pendingUpdates = new Map(); // Track pending updates to prevent duplicates
     this.defaultData = {
       sites: {},
       globalStats: {
@@ -97,6 +98,12 @@ class MewTrackStorage {
   async getSiteData(domain) {
     const data = await this.getAllData();
     const normalizedDomain = this.normalizeDomain(domain);
+    
+    if (typeof logger !== 'undefined') {
+      logger.debug(`获取网站数据 - 原始域名: ${domain}, 规范化域名: ${normalizedDomain}`);
+      logger.debug(`存储的网站列表:`, Object.keys(data.sites));
+    }
+    
     return data.sites[normalizedDomain] || this.getDefaultSiteData();
   }
 
@@ -140,10 +147,8 @@ class MewTrackStorage {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         if (diffDays > 1) {
-          // 中断了连续性，所有网站变为非活跃状态
-          Object.values(data.sites).forEach(site => {
-            site.isActive = false;
-          });
+          // 中断了连续性，重置全局streak
+          data.globalStats.totalStreak = 0;
         }
       }
       
@@ -163,8 +168,34 @@ class MewTrackStorage {
     // 规范化域名
     const normalizedDomain = this.normalizeDomain(domain);
     
+    // Check if there's already a pending update for this domain today
+    const updateKey = `${normalizedDomain}-${today}`;
+    if (this.pendingUpdates.has(updateKey)) {
+      return this.pendingUpdates.get(updateKey);
+    }
+    
+    // Create a promise for this update
+    const updatePromise = this._performSiteUpdate(data, normalizedDomain, today, isLearningContent);
+    this.pendingUpdates.set(updateKey, updatePromise);
+    
+    // Clean up the pending update after completion
+    updatePromise.finally(() => {
+      this.pendingUpdates.delete(updateKey);
+    });
+    
+    return updatePromise;
+  }
+  
+  async _performSiteUpdate(data, normalizedDomain, today, isLearningContent) {
+    if (typeof logger !== 'undefined') {
+      logger.debug(`更新网站访问记录 - 域名: ${normalizedDomain}, 今天: ${today}`);
+    }
+    
     if (!data.sites[normalizedDomain]) {
       data.sites[normalizedDomain] = this.getDefaultSiteData();
+      if (typeof logger !== 'undefined') {
+        logger.debug(`为 ${normalizedDomain} 创建新的网站数据`);
+      }
     }
 
     const siteData = data.sites[normalizedDomain];
@@ -184,8 +215,9 @@ class MewTrackStorage {
           siteData.streak++;
           siteData.isActive = true;
         } else if (diffDays > 1) {
-          // 网站中断，保持streak但变灰
-          siteData.isActive = false;
+          // 网站中断，重置streak
+          siteData.streak = 1;
+          siteData.isActive = true;
         }
       } else {
         // 第一次访问
@@ -212,24 +244,20 @@ class MewTrackStorage {
       
       // 如果这是今天第一个打卡的网站，更新总streak
       if (data.globalStats.checkedSitesToday.length === 1) {
-        if (data.globalStats.lastCheckDate === today) {
-          // 检查是否连续
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          const yesterdayStr = yesterday.toDateString();
-          
-          // 查找昨天是否有打卡记录
-          const hasYesterdayRecord = Object.values(data.sites).some(site => 
-            site.lastVisitDate === yesterdayStr
-          );
-          
-          if (hasYesterdayRecord || data.globalStats.totalStreak === 0) {
-            data.globalStats.totalStreak++;
-          } else {
-            data.globalStats.totalStreak = 1; // 重新开始
-          }
+        // 检查是否连续
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toDateString();
+        
+        // 查找昨天是否有打卡记录
+        const hasYesterdayRecord = Object.values(data.sites).some(site => 
+          site.lastVisitDate === yesterdayStr
+        );
+        
+        if (hasYesterdayRecord || data.globalStats.totalStreak === 0) {
+          data.globalStats.totalStreak++;
         } else {
-          data.globalStats.totalStreak = 1;
+          data.globalStats.totalStreak = 1; // 重新开始
         }
         
         data.globalStats.totalDays++;
@@ -238,6 +266,15 @@ class MewTrackStorage {
     }
     
     await this.saveAllData(data);
+    
+    if (typeof logger !== 'undefined') {
+      logger.debug(`网站数据更新完成 - ${normalizedDomain}:`, {
+        streak: siteData.streak,
+        totalDays: siteData.totalDays,
+        isActive: siteData.isActive,
+        lastVisitDate: siteData.lastVisitDate
+      });
+    }
     
     return {
       isNewVisit: isNewVisitToday,
@@ -316,6 +353,15 @@ class MewTrackStorage {
 
   // 检查今天是否已经访问过某个网站
   async hasVisitedToday(domain) {
+    const today = new Date().toDateString();
+    const normalizedDomain = this.normalizeDomain(domain);
+    
+    // Check pending updates first
+    const updateKey = `${normalizedDomain}-${today}`;
+    if (this.pendingUpdates.has(updateKey)) {
+      return true; // Already being processed
+    }
+    
     const data = await this.getAllData();
     
     // 确保globalStats存在
@@ -323,18 +369,28 @@ class MewTrackStorage {
       return false;
     }
     
-    // 规范化域名（移除www.前缀）
-    const normalizedDomain = this.normalizeDomain(domain);
-    
     // 检查是否已访问（同时检查原始域名和规范化域名）
     return data.globalStats.checkedSitesToday.some(checkedDomain => 
       this.normalizeDomain(checkedDomain) === normalizedDomain
     );
   }
   
-  // 规范化域名（移除www.前缀）
+  // 规范化域名（移除www.前缀，并处理YouTube等特殊域名）
   normalizeDomain(domain) {
-    return domain.replace(/^www\./, '');
+    // 首先移除www.前缀
+    let normalized = domain.replace(/^www\./, '');
+    
+    // 特殊处理YouTube的各种子域名
+    if (normalized.includes('youtube.com')) {
+      return 'youtube.com';
+    }
+    
+    // 特殊处理Bilibili的各种子域名
+    if (normalized.includes('bilibili.com')) {
+      return 'bilibili.com';
+    }
+    
+    return normalized;
   }
 
   // 获取连续访问天数最多的网站

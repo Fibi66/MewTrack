@@ -1,19 +1,28 @@
-// OpenAI API 集成模块
-class OpenAIIntegration {
+// AI API 集成模块（支持OpenAI和DeepSeek）
+class AIIntegration {
   constructor() {
     // API配置
-    this.apiKey = null;
-    this.apiEndpoint = 'https://api.openai.com/v1/chat/completions';
-    this.model = 'gpt-3.5-turbo';
+    this.providers = {
+      openai: {
+        apiKey: null,
+        apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+        model: 'gpt-3.5-turbo',
+        name: 'OpenAI'
+      },
+      deepseek: {
+        apiKey: null,
+        apiEndpoint: 'https://api.deepseek.com/v1/chat/completions',
+        model: 'deepseek-chat',
+        name: 'DeepSeek'
+      }
+    };
+    
+    // 当前使用的提供商（优先使用配置了密钥的）
+    this.currentProvider = null;
   }
 
   // 初始化API密钥
   async init() {
-    // 如果已经有密钥，直接返回
-    if (this.apiKey) {
-      return true;
-    }
-    
     try {
       // 使用Promise包装chrome.storage调用，增加超时保护
       const data = await new Promise((resolve, reject) => {
@@ -25,7 +34,7 @@ class OpenAIIntegration {
         // 尝试访问storage
         try {
           if (chrome && chrome.storage && chrome.storage.local) {
-            chrome.storage.local.get(['openaiApiKey'], (result) => {
+            chrome.storage.local.get(['openaiApiKey', 'deepseekApiKey'], (result) => {
               clearTimeout(timeout);
               if (chrome.runtime.lastError) {
                 reject(chrome.runtime.lastError);
@@ -43,36 +52,45 @@ class OpenAIIntegration {
         }
       });
       
-      this.apiKey = data.openaiApiKey || null;
+      // 加载API密钥
+      this.providers.openai.apiKey = data.openaiApiKey || null;
+      this.providers.deepseek.apiKey = data.deepseekApiKey || null;
       
-      if (this.apiKey) {
+      // 选择有效的提供商（优先OpenAI，然后DeepSeek）
+      if (this.providers.openai.apiKey) {
+        this.currentProvider = 'openai';
         if (typeof logger !== 'undefined') {
-          logger.info('OpenAI API密钥已加载');
+          logger.info('使用 OpenAI API');
+        }
+      } else if (this.providers.deepseek.apiKey) {
+        this.currentProvider = 'deepseek';
+        if (typeof logger !== 'undefined') {
+          logger.info('使用 DeepSeek API');
         }
       } else {
+        this.currentProvider = null;
         if (typeof logger !== 'undefined') {
-          logger.debug('未设置OpenAI API密钥');
+          logger.debug('未设置任何AI API密钥');
         }
       }
       
-      return !!this.apiKey;
+      return !!this.currentProvider;
     } catch (error) {
       // 处理各种错误情况
       if (error.message && error.message.includes('Extension context invalidated')) {
         if (typeof logger !== 'undefined') {
           logger.contextError('扩展上下文已失效，请刷新页面');
         }
-        this.apiKey = null;
       } else if (error.message && (error.message.includes('Chrome storage API not available') || error.message.includes('Storage access timeout'))) {
         if (typeof logger !== 'undefined') {
           logger.contextError('Chrome存储API不可用或超时');
         }
-        this.apiKey = null;
       } else {
         if (typeof logger !== 'undefined') {
           logger.warn('获取API密钥失败:', error.message || error);
         }
       }
+      this.currentProvider = null;
       return false;
     }
   }
@@ -88,7 +106,7 @@ class OpenAIIntegration {
   }
 
   // 设置API密钥
-  async setApiKey(apiKey) {
+  async setApiKey(provider, apiKey) {
     try {
       // 检查扩展上下文是否有效
       if (!this.isExtensionContextValid()) {
@@ -98,26 +116,39 @@ class OpenAIIntegration {
         return false;
       }
       
-      await chrome.storage.local.set({ openaiApiKey: apiKey });
-      this.apiKey = apiKey;
+      const storageKey = provider === 'openai' ? 'openaiApiKey' : 'deepseekApiKey';
+      await chrome.storage.local.set({ [storageKey]: apiKey });
+      this.providers[provider].apiKey = apiKey;
+      
+      // 如果当前没有提供商，或者设置的是OpenAI（优先级更高），则切换
+      if (!this.currentProvider || provider === 'openai') {
+        this.currentProvider = provider;
+      }
+      
       return true;
     } catch (error) {
       if (typeof logger !== 'undefined') {
-        logger.error('保存OpenAI API密钥失败:', error);
+        logger.error(`保存${provider} API密钥失败:`, error);
       }
       return false;
     }
   }
 
+  // 获取当前的API密钥（用于兼容旧代码）
+  get apiKey() {
+    return this.currentProvider ? this.providers[this.currentProvider].apiKey : null;
+  }
+
   // 分析网页内容是否为学习内容
   async analyzeContent(title, description, url) {
-    if (!this.apiKey) {
+    if (!this.currentProvider) {
       if (typeof logger !== 'undefined') {
-        logger.debug('OpenAI API密钥未设置');
+        logger.debug('未配置任何AI API密钥');
       }
       return null;
     }
 
+    const provider = this.providers[this.currentProvider];
     const prompt = `请分析以下网站内容，判断这是否是学习/教育类内容。
 
 视频标题: ${title}
@@ -137,7 +168,7 @@ URL: ${url}
 
     // 记录发送的请求
     if (typeof logger !== 'undefined') {
-      logger.debug('OpenAI API 请求:', {
+      logger.debug(`${provider.name} API 请求:`, {
         title,
         description: description ? description.substring(0, 100) + '...' : '无描述',
         url,
@@ -146,14 +177,14 @@ URL: ${url}
     }
 
     try {
-      const response = await fetch(this.apiEndpoint, {
+      const response = await fetch(provider.apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
+          'Authorization': `Bearer ${provider.apiKey}`
         },
         body: JSON.stringify({
-          model: this.model,
+          model: provider.model,
           messages: [
             {
               role: 'system',
@@ -172,7 +203,7 @@ URL: ${url}
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (typeof logger !== 'undefined') {
-          logger.apiError('OpenAI', {
+          logger.apiError(provider.name, {
             status: response.status,
             message: errorData.error?.message || response.statusText
           }, {
@@ -188,7 +219,7 @@ URL: ${url}
       
       // 记录API响应
       if (typeof logger !== 'undefined') {
-        logger.debug('OpenAI API 响应:', {
+        logger.debug(`${provider.name} API 响应:`, {
           raw_response: content,
           usage: data.usage
         });
@@ -198,12 +229,12 @@ URL: ${url}
       try {
         const result = JSON.parse(content);
         if (typeof logger !== 'undefined') {
-          logger.debug('OpenAI API 解析结果:', result);
+          logger.debug(`${provider.name} API 解析结果:`, result);
         }
         return result;
       } catch (parseError) {
         if (typeof logger !== 'undefined') {
-          logger.warn('解析OpenAI响应失败:', parseError);
+          logger.warn(`解析${provider.name}响应失败:`, parseError);
           logger.debug('原始响应内容:', content);
         }
         // 尝试从文本中提取信息
@@ -218,7 +249,7 @@ URL: ${url}
       }
     } catch (error) {
       if (typeof logger !== 'undefined') {
-        logger.apiError('OpenAI', error);
+        logger.apiError(provider.name, error);
       }
       return null;
     }
@@ -240,20 +271,23 @@ URL: ${url}
   }
 
   // 检查API密钥是否有效
-  async validateApiKey() {
-    if (!this.apiKey) {
+  async validateApiKey(provider = null) {
+    const targetProvider = provider || this.currentProvider;
+    if (!targetProvider || !this.providers[targetProvider].apiKey) {
       return false;
     }
 
+    const providerConfig = this.providers[targetProvider];
+    
     try {
-      const response = await fetch(this.apiEndpoint, {
+      const response = await fetch(providerConfig.apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
+          'Authorization': `Bearer ${providerConfig.apiKey}`
         },
         body: JSON.stringify({
-          model: this.model,
+          model: providerConfig.model,
           messages: [{ role: 'user', content: 'Hello' }],
           max_tokens: 5
         })
@@ -262,12 +296,13 @@ URL: ${url}
       return response.ok;
     } catch (error) {
       if (typeof logger !== 'undefined') {
-        logger.warn('API密钥验证失败:', error);
+        logger.warn(`${providerConfig.name} API密钥验证失败:`, error);
       }
       return false;
     }
   }
 }
 
-// 导出实例
-const openAIIntegration = new OpenAIIntegration();
+// 导出实例（保持向后兼容）
+const openAIIntegration = new AIIntegration();
+const aiIntegration = openAIIntegration; // 别名，更清晰的命名

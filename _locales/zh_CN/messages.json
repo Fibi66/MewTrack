@@ -78,7 +78,37 @@
     "message": "跳过"
   },
   "learningDetected": {
-    "message": "检测到学习内容！"
+    "message": "发现学习内容！"
+  },
+  "detectedLearningAt": {
+    "message": "检测到您正在学习"
+  },
+  "createCheckInPlan": {
+    "message": "要为这个网站创建打卡计划吗？"
+  },
+  "targetCheckInDays": {
+    "message": "目标打卡天数"
+  },
+  "days": {
+    "message": "天"
+  },
+  "setGoalTip": {
+    "message": "设置目标，猫猫陪您学习"
+  },
+  "continuousCheckInTip": {
+    "message": "连续打卡让猫猫成长"
+  },
+  "skip": {
+    "message": "跳过"
+  },
+  "createPlan": {
+    "message": "创建计划"
+  },
+  "targetSetSuccess": {
+    "message": "已为该网站设置 {days} 天的打卡目标！加油！🎯"
+  },
+  "catAlt": {
+    "message": "猫猫"
   },
   "firstTimeMessage": {
     "message": "欢迎来到 {site}！开始你的学习之旅吧！"
@@ -118,6 +148,18 @@
   },
   "deleteApiKey": {
     "message": "删除密钥"
+  },
+  "deepseekApiDescription": {
+    "message": "DeepSeek 是 OpenAI 的替代方案，同样可以智能识别学习内容。"
+  },
+  "deepseekApiKeyLabel": {
+    "message": "API 密钥:"
+  },
+  "deepseekApiKeyPlaceholder": {
+    "message": "请输入 DeepSeek API 密钥"
+  },
+  "getDeepseekApiKey": {
+    "message": "获取 DeepSeek API 密钥"
   },
   "notificationSettings": {
     "message": "通知设置"

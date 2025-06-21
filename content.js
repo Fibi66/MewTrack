@@ -7,6 +7,8 @@
   let lastDetectionTime = 0;
   let lastDetectionUrl = '';
   const MIN_DETECTION_INTERVAL = 2000; // 2秒内不重复检测同一URL
+  // Track domains being processed to prevent duplicates
+  const processingDomains = new Set();
 
   // 检查扩展上下文是否有效
   function isExtensionContextValid() {
@@ -119,6 +121,7 @@
       if (typeof logger !== 'undefined') {
         logger.debug(`当前检测域名: ${domain}`);
         logger.debug(`完整URL: ${window.location.href}`);
+        logger.debug(`规范化域名: ${mewTrackStorage.normalizeDomain(domain)}`);
       }
       
       // 检查是否为支持的网站
@@ -163,13 +166,29 @@
         return;
       }
       
+      // Check if this domain is already being processed
+      if (processingDomains.has(domain)) {
+        if (typeof logger !== 'undefined') {
+          logger.debug(`${domain} 正在处理中，跳过重复检测`);
+        }
+        return;
+      }
+      
+      // Mark domain as being processed
+      processingDomains.add(domain);
+      
       // 检测是否为学习内容
       let isLearningContent = siteInfo.alwaysLearning;
-      if (!isLearningContent) {
+      
+      // 对于需要内容检测的网站（如YouTube），进行额外的AI检测
+      if (siteInfo.needsContentDetection) {
         if (siteInfo.type === 'video' && !siteDetector.isVideoPage()) {
           if (typeof logger !== 'undefined') {
             logger.debug(`${domain} 不是视频页面，跳过检测`);
+            logger.debug(`URL路径: ${window.location.pathname}`);
+            logger.debug(`是否为视频页: ${siteDetector.isVideoPage()}`);
           }
+          processingDomains.delete(domain); // 清理处理标记
           return;
         }
         
@@ -180,15 +199,23 @@
         }
         await new Promise(resolve => setTimeout(resolve, waitTime));
         
-        // 检测内容
-        isLearningContent = await siteDetector.detectLearningContent();
+        // 检测内容（但不影响打卡流程）
+        const detectedAsLearning = await siteDetector.detectLearningContent();
         if (typeof logger !== 'undefined') {
-          logger.info(`${domain} 学习内容检测结果: ${isLearningContent}`);
+          logger.info(`${domain} AI内容检测结果: ${detectedAsLearning ? '学习内容' : '娱乐内容'}`);
         }
+        // 可以在这里记录检测结果，但不改变isLearningContent的值
       }
       
       if (isLearningContent) {
-        const siteData = await mewTrackStorage.getSiteData(domain);
+        // 使用规范化的域名
+        const normalizedDomain = mewTrackStorage.normalizeDomain(domain);
+        
+        if (typeof logger !== 'undefined') {
+          logger.debug(`处理学习内容 - 原始域名: ${domain}, 规范化域名: ${normalizedDomain}`);
+        }
+        
+        const siteData = await mewTrackStorage.getSiteData(normalizedDomain);
         const globalStats = await mewTrackStorage.getGlobalStats();
         const isFirstTime = siteData.streak === 0;
         
@@ -199,7 +226,7 @@
           }
           isShowingDialog = true;
           try {
-            await checkInDialog.show(siteInfo.name, window.location.href, domain);
+            await checkInDialog.show(siteInfo.name, window.location.href, normalizedDomain);
           } finally {
             isShowingDialog = false;
           }
@@ -212,7 +239,7 @@
           isShowingDialog = true;
           try {
             await notificationManager.showLearningNotification(
-              domain, 
+              normalizedDomain, 
               siteInfo.name, 
               globalStats.totalStreak, // 使用全局streak显示猫猫成长
               isFirstTime,
@@ -228,10 +255,10 @@
                 return;
               }
               
-              const result = await mewTrackStorage.updateSiteVisit(domain, true);
+              const result = await mewTrackStorage.updateSiteVisit(normalizedDomain, true);
               
               if (result.isNewVisit) {
-                const progress = await mewTrackStorage.getTargetProgress(domain);
+                const progress = await mewTrackStorage.getTargetProgress(normalizedDomain);
                 let message = `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
                 
                 if (progress && !progress.isCompleted) {
@@ -261,6 +288,9 @@
       if (typeof logger !== 'undefined') {
         logger.error('检测错误:', error);
       }
+    } finally {
+      // Always remove domain from processing set
+      processingDomains.delete(domain);
     }
   }
 

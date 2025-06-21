@@ -78,7 +78,37 @@
     "message": "Skip"
   },
   "learningDetected": {
-    "message": "Learning content detected!"
+    "message": "Learning Content Detected!"
+  },
+  "detectedLearningAt": {
+    "message": "Detected you are learning at"
+  },
+  "createCheckInPlan": {
+    "message": "Create a check-in plan for this site?"
+  },
+  "targetCheckInDays": {
+    "message": "Target check-in days"
+  },
+  "days": {
+    "message": "days"
+  },
+  "setGoalTip": {
+    "message": "Set a goal, let the cat accompany your learning"
+  },
+  "continuousCheckInTip": {
+    "message": "Continuous check-ins help the cat grow"
+  },
+  "skip": {
+    "message": "Skip"
+  },
+  "createPlan": {
+    "message": "Create Plan"
+  },
+  "targetSetSuccess": {
+    "message": "Target set: {days} days! Keep going! 🎯"
+  },
+  "catAlt": {
+    "message": "Cat"
   },
   "firstTimeMessage": {
     "message": "Welcome to {site}! Start your learning journey!"
@@ -118,6 +148,18 @@
   },
   "deleteApiKey": {
     "message": "Delete Key"
+  },
+  "deepseekApiDescription": {
+    "message": "DeepSeek is an alternative to OpenAI that can also intelligently identify learning content."
+  },
+  "deepseekApiKeyLabel": {
+    "message": "API Key:"
+  },
+  "deepseekApiKeyPlaceholder": {
+    "message": "Enter your DeepSeek API key"
+  },
+  "getDeepseekApiKey": {
+    "message": "Get DeepSeek API Key"
   },
   "notificationSettings": {
     "message": "Notification Settings"
