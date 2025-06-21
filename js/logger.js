@@ -45,22 +45,40 @@ class MewTrackLogger {
   }
   
   // Send log to Service Worker for centralized logging
-  async sendToServiceWorker(level, levelName, message, args) {
+  sendToServiceWorker(level, levelName, message, args) {
     if (!this.isServiceWorker && chrome?.runtime?.sendMessage) {
       try {
-        await chrome.runtime.sendMessage({
+        // Serialize args to ensure they can be sent via message passing
+        const serializedArgs = args.map(arg => {
+          try {
+            // Try to convert to JSON-safe format
+            if (arg instanceof Error) {
+              return { type: 'Error', message: arg.message, stack: arg.stack };
+            } else if (typeof arg === 'object' && arg !== null) {
+              return JSON.parse(JSON.stringify(arg));
+            }
+            return arg;
+          } catch (e) {
+            return String(arg);
+          }
+        });
+        
+        chrome.runtime.sendMessage({
           action: 'log',
           source: this.source,
           level: level,
           levelName: levelName,
           message: message,
-          args: args,
+          args: serializedArgs,
           timestamp: Date.now(),
           url: window?.location?.href || 'N/A'
+        }).catch(e => {
+          // If Service Worker is not available, fall back to local console
+          console.log(`[MewTrack ${levelName}] ${message}`, ...args);
         });
       } catch (e) {
-        // If Service Worker is not available, fall back to local console
-        // This can happen during extension reload
+        // Synchronous errors - also fall back to console
+        console.log(`[MewTrack ${levelName}] ${message}`, ...args);
       }
     }
   }
@@ -163,6 +181,13 @@ if (typeof window !== 'undefined') {
       await chrome.storage.local.set({ debugLogLevel: level });
       console.log(`[MewTrack] 日志级别已设置为 ${level}`);
     },
-    getLevel: () => logger.logLevel
+    getLevel: () => logger.logLevel,
+    testLog: () => {
+      console.log('Testing logger - current level:', logger.logLevel);
+      logger.debug('This is a debug message');
+      logger.info('This is an info message');
+      logger.warn('This is a warning message');
+      logger.error('This is an error message');
+    }
   };
 }

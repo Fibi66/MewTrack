@@ -163,6 +163,11 @@ chrome.runtime.onStartup.addListener(async () => {
 
 // 监听来自 Content Script 的消息
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // 立即记录收到的消息（用于调试）
+  if (request.action === 'log' && logger.logLevel >= 4) {
+    console.log('[MewTrack SW] 收到日志消息:', request);
+  }
+  
   // 处理统一日志消息
   if (request.action === 'log') {
     // 检查日志级别
