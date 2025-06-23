@@ -1,6 +1,6 @@
 # 🐱 MewTrack - Cat Growth Tracker
 
-> Track your learning progress and let adorable cats accompany your journey every day!
+> A Google Chrome Extention to track your learning progress and let adorable cats accompany your journey every day!
 
 ## ✨ Features
 
