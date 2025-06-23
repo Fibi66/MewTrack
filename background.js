@@ -114,11 +114,64 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
+// 清理过期的每日数据
+async function cleanupDailyData() {
+  try {
+    const result = await chrome.storage.local.get('mewtrack_data');
+    const data = result.mewtrack_data;
+    
+    if (data && data.globalStats) {
+      const today = new Date().toDateString();
+      const lastCheckDate = data.globalStats.lastCheckDate;
+      
+      if (lastCheckDate && lastCheckDate !== today) {
+        logger.info('新的一天开始，清理昨天的打卡记录');
+        
+        // 重置今天的打卡记录
+        data.globalStats.checkedSitesToday = [];
+        data.globalStats.lastCheckDate = today;
+        
+        // 保存更新后的数据
+        await chrome.storage.local.set({ mewtrack_data: data });
+        logger.info('每日数据清理完成');
+      }
+    }
+  } catch (error) {
+    logger.error('清理每日数据时出错:', error);
+  }
+}
+
+// 设置午夜定时器
+function setupMidnightTimer() {
+  // 计算到下一个午夜的毫秒数
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  
+  const millisecondsUntilMidnight = tomorrow - now;
+  
+  logger.info(`设置午夜定时器，将在 ${Math.round(millisecondsUntilMidnight / 1000 / 60)} 分钟后触发`);
+  
+  // 设置定时器
+  setTimeout(() => {
+    cleanupDailyData();
+    // 设置下一个午夜的定时器
+    setupMidnightTimer();
+  }, millisecondsUntilMidnight);
+}
+
+// 启动时设置定时器
+setupMidnightTimer();
+
 // Listen for daily reset (check date changes when browser starts)
 chrome.runtime.onStartup.addListener(async () => {
   if (typeof logger !== 'undefined') {
     logger.info('MewTrack browser startup check...');
   }
+  
+  // 浏览器启动时也执行清理
+  await cleanupDailyData();
   try {
     const result = await chrome.storage.local.get('mewtrack_data');
     const data = result.mewtrack_data;
@@ -143,10 +196,6 @@ chrome.runtime.onStartup.addListener(async () => {
             site.isActive = false;
           });
         }
-        
-        // Reset today's check-in records
-        data.globalStats.checkedSitesToday = [];
-        data.globalStats.lastCheckDate = today;
         
         await chrome.storage.local.set({ mewtrack_data: data });
         if (typeof logger !== 'undefined') {

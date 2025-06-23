@@ -473,6 +473,15 @@
   "streakDay1": {
     "message": "Day one! The cat egg appears, a new learning journey begins! 🐣"
   },
+  "streakDay2": {
+    "message": "Day two! You're starting to build a learning habit, the cat egg is trembling slightly! Keep going! 💪"
+  },
+  "streakDay3": {
+    "message": "Three days in a row! Cracks appear on the cat egg, your persistence is bringing it to life! ✨"
+  },
+  "streakDay7": {
+    "message": "One week! The cat egg is about to hatch, your learning habit is forming! Just a few more days to meet the kitten! 🥚➡️🐱"
+  },
   "streakDay10": {
     "message": "Ten days of persistence, the cat has hatched! A cute kitten is looking forward to growing with you! 😸"
   },

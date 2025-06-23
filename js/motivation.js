@@ -8,6 +8,9 @@ class MotivationGenerator {
 
     this.streakMilestones = {
       1: 'streakDay1',
+      2: 'streakDay2',
+      3: 'streakDay3',
+      7: 'streakDay7',
       10: 'streakDay10',
       30: 'streakDay30',
       50: 'streakDay50',

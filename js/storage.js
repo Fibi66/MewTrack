@@ -56,7 +56,29 @@ class MewTrackStorage {
         }
       });
       
-      return result[this.storageKey] || this.defaultData;
+      const data = result[this.storageKey] || this.defaultData;
+      
+      // 检查并清理过期的 checkedSitesToday
+      if (data.globalStats && data.globalStats.lastCheckDate) {
+        const today = new Date().toDateString();
+        const lastCheckDate = data.globalStats.lastCheckDate;
+        
+        // 如果最后检查日期不是今天，清空 checkedSitesToday
+        if (lastCheckDate !== today) {
+          data.globalStats.checkedSitesToday = [];
+          // 不在这里更新 lastCheckDate，让它在实际打卡时更新
+          // 这样可以正确追踪是否是连续打卡
+          
+          if (typeof logger !== 'undefined') {
+            logger.info('新的一天开始，已清空昨天的打卡记录');
+          }
+        }
+      } else {
+        // 如果没有lastCheckDate，保持为null
+        // 让第一次打卡时设置
+      }
+      
+      return data;
     } catch (error) {
       // 这个catch块现在应该很少被触发
       return this.defaultData;
@@ -137,24 +159,12 @@ class MewTrackStorage {
       };
     }
     
-    // 如果是新的一天，重置今天的打卡记录
+    // 如果是新的一天，只清理checkedSitesToday，不更新lastCheckDate
     if (data.globalStats.lastCheckDate !== today) {
-      // 检查是否连续
-      if (data.globalStats.lastCheckDate) {
-        const lastDate = new Date(data.globalStats.lastCheckDate);
-        const todayDate = new Date(today);
-        const diffTime = todayDate - lastDate;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays > 1) {
-          // 中断了连续性，重置全局streak
-          data.globalStats.totalStreak = 0;
-        }
-      }
-      
-      data.globalStats.lastCheckDate = today;
+      // 清空今天的打卡记录，但不更新lastCheckDate
+      // lastCheckDate 会在实际打卡时更新
       data.globalStats.checkedSitesToday = [];
-      await this.saveAllData(data);
+      // 不在这里保存数据，避免竞态条件
     }
     
     return data;
@@ -241,6 +251,7 @@ class MewTrackStorage {
       this.normalizeDomain(d) === normalizedDomain
     )) {
       data.globalStats.checkedSitesToday.push(normalizedDomain);
+      data.globalStats.lastCheckDate = today; // 更新最后检查日期
       
       // 如果这是今天第一个打卡的网站，更新总streak
       if (data.globalStats.checkedSitesToday.length === 1) {
@@ -254,11 +265,14 @@ class MewTrackStorage {
           site.lastVisitDate === yesterdayStr
         );
         
-        if (hasYesterdayRecord || data.globalStats.totalStreak === 0) {
+        if (hasYesterdayRecord) {
+          // 昨天有打卡，连续天数+1
           data.globalStats.totalStreak++;
-        } else {
-          data.globalStats.totalStreak = 1; // 重新开始
+        } else if (data.globalStats.totalStreak === 0) {
+          // 第一次打卡，设置为1
+          data.globalStats.totalStreak = 1;
         }
+        // 如果已经有totalStreak但昨天没打卡，保持不变
         
         data.globalStats.totalDays++;
         data.globalStats.maxStreak = Math.max(data.globalStats.maxStreak, data.globalStats.totalStreak);
@@ -397,6 +411,15 @@ class MewTrackStorage {
     
     // 确保globalStats存在
     if (!data.globalStats || !data.globalStats.checkedSitesToday) {
+      return false;
+    }
+    
+    // 双重检查：即使 getAllData 应该已经清理了，这里再检查一次
+    if (data.globalStats.lastCheckDate && data.globalStats.lastCheckDate !== today) {
+      if (typeof logger !== 'undefined') {
+        logger.warn('hasVisitedToday: 检测到日期不匹配，应该已经被清理。lastCheckDate:', data.globalStats.lastCheckDate, 'today:', today);
+      }
+      // 这种情况不应该发生，但如果发生了，返回 false
       return false;
     }
     

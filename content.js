@@ -269,6 +269,19 @@
           logger.debug(`今天已经为 ${domain} 打过卡了。`);
         }
         return;
+      } else {
+        if (typeof logger !== 'undefined') {
+          logger.info(`${domain} 今天还未打卡，准备显示打卡弹窗`);
+          
+          // 获取当前的统计数据用于调试
+          const data = await mewTrackStorage.getAllData();
+          logger.debug('当前全局统计:', {
+            totalStreak: data.globalStats.totalStreak,
+            lastCheckDate: data.globalStats.lastCheckDate,
+            checkedSitesToday: data.globalStats.checkedSitesToday,
+            今天日期: new Date().toDateString()
+          });
+        }
       }
 
       // 检查是否正在显示弹窗
@@ -353,7 +366,7 @@
           
           isShowingDialog = true;
           try {
-            await notificationManager.showLearningNotification(
+            await notificationManager.showNotification(
               normalizedDomain, 
               siteInfo.name, 
               globalStats.totalStreak, // 使用全局streak显示猫猫成长
@@ -361,7 +374,12 @@
               async () => {
               // 用户点击"确认打卡"后执行的回调
               if (typeof logger !== 'undefined') {
-                logger.info(`用户确认打卡 - ${siteInfo.name}`);
+                logger.info(`用户确认打卡 - ${siteInfo.name}`, {
+                  domain: normalizedDomain,
+                  isLearningContent: isLearningContent,
+                  siteType: siteInfo.type,
+                  alwaysLearning: siteInfo.alwaysLearning
+                });
               }
               
               // 再次检查扩展上下文
@@ -370,30 +388,29 @@
                 return;
               }
               
-              const result = await mewTrackStorage.updateSiteVisit(normalizedDomain, true);
+              const result = await mewTrackStorage.updateSiteVisit(normalizedDomain, isLearningContent);
               
-              if (result.isNewVisit) {
-                const progress = await mewTrackStorage.getTargetProgress(normalizedDomain);
-                
-                let message = i18nHelper.getMessage('checkInSuccessMsg', {
-                  site: siteInfo.name,
-                  days: result.globalStats.totalStreak
+              // 始终显示成功消息，因为弹窗只在未打卡时显示
+              const progress = await mewTrackStorage.getTargetProgress(normalizedDomain);
+              
+              let message = i18nHelper.getMessage('checkInSuccessMsg', {
+                site: siteInfo.name,
+                days: result.globalStats.totalStreak
+              });
+              
+              if (progress && !progress.isCompleted) {
+                message += '\n' + i18nHelper.getMessage('targetProgressMsg', {
+                  current: progress.current,
+                  target: progress.target,
+                  percentage: progress.percentage
                 });
-                
-                if (progress && !progress.isCompleted) {
-                  message += '\n' + i18nHelper.getMessage('targetProgressMsg', {
-                    current: progress.current,
-                    target: progress.target,
-                    percentage: progress.percentage
-                  });
-                } else if (progress && progress.isCompleted) {
-                  message += '\n' + i18nHelper.getMessage('congratsGoalComplete');
-                }
-                
-                notificationManager.showToast(message);
-                if (typeof logger !== 'undefined') {
-                  logger.info(message);
-                }
+              } else if (progress && progress.isCompleted) {
+                message += '\n' + i18nHelper.getMessage('congratsGoalComplete');
+              }
+              
+              notificationManager.showToast(message);
+              if (typeof logger !== 'undefined') {
+                logger.info(`打卡成功 - ${siteInfo.name}, 连续天数: ${result.globalStats.totalStreak}`);
               }
             }
           );
@@ -410,6 +427,30 @@
     } catch (error) {
       if (typeof logger !== 'undefined') {
         logger.error('检测错误:', error);
+        logger.error('错误堆栈:', error.stack);
+        logger.error('错误详情:', {
+          message: error.message,
+          name: error.name,
+          url: window.location.href,
+          domain: domain,
+          timestamp: new Date().toISOString()
+        });
+      }
+      // 发送错误信息到后台
+      try {
+        if (chrome.runtime && chrome.runtime.sendMessage) {
+          chrome.runtime.sendMessage({
+            action: 'detectionError',
+            error: {
+              message: error.message,
+              stack: error.stack,
+              url: window.location.href,
+              domain: domain
+            }
+          }).catch(() => {});
+        }
+      } catch (e) {
+        // 忽略发送错误
       }
     } finally {
       // Always remove domain from processing set

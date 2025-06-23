@@ -351,13 +351,12 @@ class CheckInDialog {
       
       // 立即进行一次打卡
       const result = await mewTrackStorage.updateSiteVisit(domain, true);
-      if (result.isNewVisit) {
-        const siteInfo = await siteDetector.getSiteInfo(domain);
-        const message = isEnglish ? 
-          `Check-in successful for ${siteInfo.name}! Total streak: ${result.globalStats.totalStreak} days` : 
-          `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
-        notificationManager.showToast(message);
-      }
+      // 始终显示成功消息
+      const siteInfo = await siteDetector.getSiteInfo(domain);
+      const message = isEnglish ? 
+        `Check-in successful for ${siteInfo.name}! Total streak: ${result.globalStats.totalStreak} days` : 
+        `已为 ${siteInfo.name} 打卡成功！总连续天数: ${result.globalStats.totalStreak} 天`;
+      notificationManager.showToast(message);
     });
 
     // 点击遮罩关闭

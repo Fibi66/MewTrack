@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+      
+      body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: white;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #6366F1 0%, #A78BFA 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 10s ease infinite;
+        color: white;
+        padding: 20px 40px;
+        border-bottom-right-radius: 50px;
+      }
+      
+      .title {
+        font-size: 36px;
+        font-weight: 600;
+      }
+      
+      .content {
+        display: flex;
+        padding: 40px;
+        flex: 1;
+      }
+      
+      .left-content {
+        flex: 1;
+        padding-right: 40px;
+      }
+      
+      .right-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      
+      .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #6366F1;
+        margin-bottom: 15px;
+      }
+      
+      .problem-list {
+        margin-bottom: 30px;
+      }
+      
+      .problem-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.5s ease;
+      }
+      
+      .problem-icon {
+        color: #EF4444;
+        margin-right: 10px;
+        font-size: 20px;
+      }
+      
+      .solution-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.5s ease;
+      }
+      
+      .solution-icon {
+        color: #10B981;
+        margin-right: 10px;
+        font-size: 20px;
+      }
+      
+      .value-proposition {
+        background: linear-gradient(135deg, #6366F1 0%, #A78BFA 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        opacity: 0;
+        transform: scale(0.95);
+        transition: all 0.8s ease;
+      }
+      
+      .chart-container {
+        width: 100%;
+        min-height: 350px;
+        opacity: 0;
+        transition: opacity 1s ease;
+      }
+      
+      .popup-image {
+        width: 400px;
+        height: auto;
+        margin: 20px auto;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.8s ease;
+      }
+      
+      /* Custom animations */
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.03);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      
+      .animate-pulse {
+        animation: pulse 2s infinite;
+      }
+      
+      .show {
+        opacity: 1;
+        transform: translateX(0) translateY(0) scale(1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <div class="header animate__animated animate__fadeIn">
+        <h1 class="title">Product Solution</h1>
+      </div>
+      
+      <div class="content">
+        <div class="left-content">
+          <div>
+            <h2 class="section-title animate__animated animate__fadeIn">Core Problems</h2>
+            <div class="problem-list">
+              <div class="problem-item">
+                <i class="fas fa-times-circle problem-icon"></i>
+                <p>Manual check-ins are tedious and often forgotten</p>
+              </div>
+              <div class="problem-item">
+                <i class="fas fa-times-circle problem-icon"></i>
+                <p>Cross-platform learning tracking is challenging</p>
+              </div>
+              <div class="problem-item">
+                <i class="fas fa-times-circle problem-icon"></i>
+                <p>Users struggle to maintain learning consistency</p>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h2 class="section-title animate__animated animate__fadeIn" style="animation-delay: 0.3s;">Our Solution</h2>
+            <div class="problem-list">
+              <div class="solution-item">
+                <i class="fas fa-check-circle solution-icon"></i>
+                <p><strong>AI Smart Detection</strong> - Auto-identifies learning content</p>
+              </div>
+              <div class="solution-item">
+                <i class="fas fa-check-circle solution-icon"></i>
+                <p><strong>Gamification</strong> - Cat growth stages for motivation</p>
+              </div>
+              <div class="solution-item">
+                <i class="fas fa-check-circle solution-icon"></i>
+                <p><strong>Visual Tracking</strong> - Clear progress visualization</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="value-proposition">
+            <h2 class="section-title" style="color: white; margin-bottom: 10px;">Unique Value</h2>
+            <p>Cat companions make learning fun and rewarding, transforming tracking into an engaging growth journey.</p>
+          </div>
+        </div>
+        
+        <div class="right-content">
+          <div class="chart-container">
+            <canvas id="solutionChart"></canvas>
+          </div>
+          <img src="file:///home/ubuntu/MewTrack_Presentation/assets/screenshot_popup.png" alt="MewTrack Detection" class="popup-image">
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Animate elements on load
+      document.addEventListener('DOMContentLoaded', function() {
+        // Animate problem items
+        const problemItems = document.querySelectorAll('.problem-item');
+        problemItems.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add('show');
+          }, 500 + (index * 200));
+        });
+        
+        // Animate solution items
+        const solutionItems = document.querySelectorAll('.solution-item');
+        solutionItems.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add('show');
+          }, 1200 + (index * 200));
+        });
+        
+        // Animate value proposition
+        setTimeout(() => {
+          document.querySelector('.value-proposition').classList.add('show', 'animate-pulse');
+        }, 2000);
+        
+        // Animate chart
+        setTimeout(() => {
+          document.querySelector('.chart-container').classList.add('show');
+          createChart();
+        }, 800);
+        
+        // Animate image
+        setTimeout(() => {
+          document.querySelector('.popup-image').classList.add('show');
+        }, 1500);
+      });
+      
+      // Chart data
+      function createChart() {
+        const ctx = document.getElementById('solutionChart').getContext('2d');
+        const solutionChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: ['Ease of Use', 'Motivation', 'Consistency', 'Cross-Platform', 'Automation'],
+            datasets: [
+              {
+                label: 'Traditional',
+                data: [30, 20, 25, 15, 10],
+                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                borderColor: 'rgba(239, 68, 68, 1)',
+                pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(239, 68, 68, 1)'
+              },
+              {
+                label: 'MewTrack',
+                data: [85, 90, 80, 95, 90],
+                backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                borderColor: 'rgba(99, 102, 241, 1)',
+                pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(99, 102, 241, 1)'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                angleLines: {
+                  display: true
+                },
+                suggestedMin: 0,
+                suggestedMax: 100,
+                animation: {
+                  duration: 2000,
+                  easing: 'easeOutQuart'
+                }
+              }
+            },
+            animation: {
+              duration: 2000
+            },
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+

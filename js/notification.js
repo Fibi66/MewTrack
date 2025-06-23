@@ -15,7 +15,7 @@ class NotificationManager {
   }
 
   // 显示通知
-  async showNotification(domain, siteName, globalStreak, isFirstTime = false) {
+  async showNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirmCallback = null) {
     if (this.isShowing) {
       if (typeof logger !== 'undefined') {
         logger.debug('通知已显示，跳过此次显示');
@@ -35,11 +35,14 @@ class NotificationManager {
     }
 
     this.isShowing = true;
+    this.notification = null;
+    this.onConfirmCallback = onConfirmCallback; // 保存回调函数
     
     const motivation = await motivationGenerator.generatePersonalizedMotivation(globalStreak, siteName, isFirstTime);
     
     // 创建弹窗元素
     const notification = this.createNotificationElement(motivation, domain, siteName, globalStreak);
+    this.notification = notification;
     
     // 添加到页面
     document.body.appendChild(notification);
@@ -107,15 +110,28 @@ class NotificationManager {
     return i18nHelper.getMessage(stageKeys[stage] || 'catStageUnknown');
   }
 
+  // 显示学习通知（别名，保持兼容性）
+  async showLearningNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirmCallback = null) {
+    return this.showNotification(domain, siteName, globalStreak, isFirstTime, onConfirmCallback);
+  }
+
   // 隐藏弹窗
   hideNotification() {
+    // 清理定时器
+    if (this.autoHideTimer) {
+      clearTimeout(this.autoHideTimer);
+      this.autoHideTimer = null;
+    }
+    
     if (this.notification && this.notification.parentElement) {
       this.notification.classList.remove('show');
       setTimeout(() => {
-        if (this.notification.parentElement) {
+        if (this.notification && this.notification.parentElement) {
           this.notification.parentElement.removeChild(this.notification);
         }
         this.isShowing = false;
+        this.notification = null;
+        this.onConfirmCallback = null;
       }, 300);
     }
   }
@@ -144,6 +160,10 @@ class NotificationManager {
     closeBtn.addEventListener('click', () => this.hideNotification());
     cancelBtn.addEventListener('click', () => this.hideNotification());
     confirmBtn.addEventListener('click', () => {
+      // 执行回调函数
+      if (this.onConfirmCallback && typeof this.onConfirmCallback === 'function') {
+        this.onConfirmCallback();
+      }
       this.hideNotification();
     });
   }
