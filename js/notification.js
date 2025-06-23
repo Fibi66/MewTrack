@@ -15,7 +15,7 @@ class NotificationManager {
   }
 
   // 显示通知
-  async showNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirmCallback = null) {
+  async showNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirmCallback = null, willIncreaseTotalStreak = false) {
     if (this.isShowing) {
       if (typeof logger !== 'undefined') {
         logger.debug('通知已显示，跳过此次显示');
@@ -41,7 +41,7 @@ class NotificationManager {
     const motivation = await motivationGenerator.generatePersonalizedMotivation(globalStreak, siteName, isFirstTime);
     
     // 创建弹窗元素
-    const notification = this.createNotificationElement(motivation, domain, siteName, globalStreak);
+    const notification = this.createNotificationElement(motivation, domain, siteName, globalStreak, willIncreaseTotalStreak);
     this.notification = notification;
     
     // 添加到页面
@@ -62,8 +62,9 @@ class NotificationManager {
   }
 
   // 创建通知元素
-  createNotificationElement(motivation, domain, siteName, globalStreak) {
-    const nextStreak = globalStreak + 1;
+  createNotificationElement(motivation, domain, siteName, globalStreak, willIncreaseTotalStreak = false) {
+    // 只有在今天第一次打卡时才会增加totalStreak
+    const nextStreak = willIncreaseTotalStreak ? globalStreak + 1 : globalStreak;
     const stage = Math.min(Math.floor(globalStreak / 10), 3);
     const stageName = this.getStageName(stage);
     const catImage = chrome.runtime.getURL(`images/cat-stage-${stage + 1}.png`);
@@ -78,7 +79,7 @@ class NotificationManager {
           </div>
           <div class="site-info">
             <h3>${siteName}</h3>
-            <p class="streak-info">${i18nHelper.getMessage('totalLearningStreak')} ${globalStreak} ${i18nHelper.getMessage('days')} → ${nextStreak} ${i18nHelper.getMessage('days')}</p>
+            <p class="streak-info">${i18nHelper.getMessage('totalLearningStreak')} ${globalStreak} ${i18nHelper.getMessage('days')}${globalStreak !== nextStreak ? ` → ${nextStreak} ${i18nHelper.getMessage('days')}` : ''}</p>
             <p class="cat-stage">${i18nHelper.getMessage('catGrowth')}: ${stageName}</p>
           </div>
           <button class="close-btn" title="${i18nHelper.getMessage('close')}">×</button>
@@ -111,8 +112,8 @@ class NotificationManager {
   }
 
   // 显示学习通知（别名，保持兼容性）
-  async showLearningNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirmCallback = null) {
-    return this.showNotification(domain, siteName, globalStreak, isFirstTime, onConfirmCallback);
+  async showLearningNotification(domain, siteName, globalStreak, isFirstTime = false, onConfirmCallback = null, willIncreaseTotalStreak = false) {
+    return this.showNotification(domain, siteName, globalStreak, isFirstTime, onConfirmCallback, willIncreaseTotalStreak);
   }
 
   // 隐藏弹窗

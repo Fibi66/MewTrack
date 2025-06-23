@@ -366,6 +366,37 @@
           
           isShowingDialog = true;
           try {
+            // 计算是否会增加totalStreak
+            // 1. 今天还没有任何网站打卡
+            // 2. 昨天有打卡记录（连续）
+            const willIncreaseTotalStreak = await (async () => {
+              if (globalStats.checkedSitesToday.length > 0) {
+                // 今天已经有其他网站打卡了
+                return false;
+              }
+              
+              // 检查昨天是否有打卡
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+              const yesterdayStr = yesterday.toDateString();
+              
+              const data = await mewTrackStorage.getAllData();
+              const hasYesterdayRecord = Object.values(data.sites).some(site => 
+                site.lastVisitDate === yesterdayStr
+              );
+              
+              // 如果昨天有打卡，会增加；如果totalStreak是0（第一次），也会增加到1
+              return hasYesterdayRecord || globalStats.totalStreak === 0;
+            })();
+            
+            if (typeof logger !== 'undefined') {
+              logger.debug('打卡弹窗计算:', {
+                currentTotalStreak: globalStats.totalStreak,
+                willIncreaseTotalStreak: willIncreaseTotalStreak,
+                checkedSitesToday: globalStats.checkedSitesToday
+              });
+            }
+            
             await notificationManager.showNotification(
               normalizedDomain, 
               siteInfo.name, 
@@ -412,7 +443,8 @@
               if (typeof logger !== 'undefined') {
                 logger.info(`打卡成功 - ${siteInfo.name}, 连续天数: ${result.globalStats.totalStreak}`);
               }
-            }
+            },
+            willIncreaseTotalStreak
           );
           } finally {
             isShowingDialog = false;
