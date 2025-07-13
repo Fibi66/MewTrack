@@ -10,7 +10,8 @@ class MewTrackStorage {
         maxStreak: 0,          // 历史最长连续天数
         lastCheckDate: null,   // 最后检查日期
         totalDays: 0,          // 总学习天数
-        checkedSitesToday: []  // 今天已打卡的网站
+        checkedSitesToday: [],  // 今天已打卡的网站
+        skippedSitesToday: []  // 今天已跳过的网站（点击Later）
       },
       settings: {
         notifications: true,
@@ -63,14 +64,15 @@ class MewTrackStorage {
         const today = new Date().toDateString();
         const lastCheckDate = data.globalStats.lastCheckDate;
         
-        // 如果最后检查日期不是今天，清空 checkedSitesToday
+        // 如果最后检查日期不是今天，清空 checkedSitesToday 和 skippedSitesToday
         if (lastCheckDate !== today) {
           data.globalStats.checkedSitesToday = [];
+          data.globalStats.skippedSitesToday = [];
           // 不在这里更新 lastCheckDate，让它在实际打卡时更新
           // 这样可以正确追踪是否是连续打卡
           
           if (typeof logger !== 'undefined') {
-            logger.info('新的一天开始，已清空昨天的打卡记录');
+            logger.info('新的一天开始，已清空昨天的打卡和跳过记录');
           }
         }
       } else {
@@ -155,15 +157,22 @@ class MewTrackStorage {
         maxStreak: 0,
         lastCheckDate: null,
         totalDays: 0,
-        checkedSitesToday: []
+        checkedSitesToday: [],
+        skippedSitesToday: []
       };
     }
     
-    // 如果是新的一天，只清理checkedSitesToday，不更新lastCheckDate
+    // 确保 skippedSitesToday 存在（兼容旧数据）
+    if (!data.globalStats.skippedSitesToday) {
+      data.globalStats.skippedSitesToday = [];
+    }
+    
+    // 如果是新的一天，只清理checkedSitesToday和skippedSitesToday，不更新lastCheckDate
     if (data.globalStats.lastCheckDate !== today) {
-      // 清空今天的打卡记录，但不更新lastCheckDate
+      // 清空今天的打卡记录和跳过记录，但不更新lastCheckDate
       // lastCheckDate 会在实际打卡时更新
       data.globalStats.checkedSitesToday = [];
+      data.globalStats.skippedSitesToday = [];
       // 不在这里保存数据，避免竞态条件
     }
     
@@ -394,6 +403,38 @@ class MewTrackStorage {
       totalVisits: data.globalStats.totalDays,
       checkedSitesToday: data.globalStats.checkedSitesToday.length
     };
+  }
+
+  // 记录今天跳过的网站
+  async markSiteAsSkippedToday(domain) {
+    const data = await this.getAllData();
+    const normalizedDomain = this.normalizeDomain(domain);
+    const today = new Date().toDateString();
+    
+    if (!data.globalStats.skippedSitesToday) {
+      data.globalStats.skippedSitesToday = [];
+    }
+    
+    if (!data.globalStats.skippedSitesToday.includes(normalizedDomain)) {
+      data.globalStats.skippedSitesToday.push(normalizedDomain);
+      await this.saveAllData(data);
+      
+      if (typeof logger !== 'undefined') {
+        logger.info(`已将 ${normalizedDomain} 标记为今天跳过`);
+      }
+    }
+  }
+
+  // 检查今天是否已经跳过该网站
+  async hasSkippedToday(domain) {
+    const data = await this.getAllData();
+    const normalizedDomain = this.normalizeDomain(domain);
+    
+    if (!data.globalStats.skippedSitesToday) {
+      data.globalStats.skippedSitesToday = [];
+    }
+    
+    return data.globalStats.skippedSitesToday.includes(normalizedDomain);
   }
 
   // 检查今天是否已经访问过某个网站

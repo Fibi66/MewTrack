@@ -195,6 +195,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${progressHTML}
               </div>
               <span class="streak-badge">${siteData.streak}</span>
+              <button class="delete-btn" data-domain="${domain}" title="${i18n.getMessage('deleteSite') || '删除网站'}">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 2C6 1.44772 6.44772 1 7 1H9C9.55228 1 10 1.44772 10 2V3H14C14.5523 3 15 3.44772 15 4C15 4.55228 14.5523 5 14 5H13V13C13 14.1046 12.1046 15 11 15H5C3.89543 15 3 14.1046 3 13V5H2C1.44772 5 1 4.55228 1 4C1 3.44772 1.44772 3 2 3H6V2ZM6 5H5V13H11V5H10M6 5V11M8 5V11M10 5V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
             </div>
           `;
         }));
@@ -232,7 +237,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     URL.revokeObjectURL(url);
   });
 
-  sitesListEl.addEventListener('click', (e) => {
+  sitesListEl.addEventListener('click', async (e) => {
+    // 处理删除按钮点击
+    const deleteBtn = e.target.closest('.delete-btn');
+    if (deleteBtn) {
+      e.stopPropagation(); // 阻止事件冒泡
+      const domain = deleteBtn.dataset.domain;
+      
+      // 确认删除
+      if (confirm(i18n.getMessage('confirmDeleteSite') || `确定要删除 ${domain} 的学习记录吗？`)) {
+        try {
+          await storage.resetSiteData(domain);
+          // 重新渲染
+          await render();
+          showToast(i18n.getMessage('siteDeletedSuccess') || '网站已删除', 'success');
+        } catch (error) {
+          if (typeof logger !== 'undefined') {
+            logger.error('删除网站失败:', error);
+          }
+          showToast(i18n.getMessage('siteDeleteFailed') || '删除失败', 'error');
+        }
+      }
+      return;
+    }
+    
+    // 处理网站点击
     const siteItem = e.target.closest('.site-item');
     if (siteItem && !siteItem.classList.contains('global-cat')) {
       const domain = siteItem.dataset.domain;

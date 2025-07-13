@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MewTrack AI检测逻辑测试</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .test-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    h2 {
+      color: #667eea;
+      margin-top: 0;
+    }
+    .test-case {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #fafafa;
+    }
+    .test-case h3 {
+      margin-top: 0;
+      color: #555;
+    }
+    .test-info {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .test-info strong {
+      color: #667eea;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #5a6fd8;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .result.pass {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .result.fail {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .console {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .console-line {
+      margin: 2px 0;
+    }
+    .summary {
+      background: #e9ecef;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>MewTrack AI检测逻辑测试</h1>
+  
+  <div class="test-container">
+    <h2>测试说明</h2>
+    <p>本页面模拟测试MewTrack扩展的AI检测逻辑，验证不同类型网站的检测结果是否符合预期。</p>
+    <p><strong>注意：</strong>这是一个模拟测试，实际检测需要在扩展环境中运行。</p>
+  </div>
+
+  <div class="test-container">
+    <h2>测试场景</h2>
+    
+    <div class="test-case">
+      <h3>场景1: YouTube娱乐视频</h3>
+      <div class="test-info"><strong>网址:</strong> https://www.youtube.com/watch?v=abc123</div>
+      <div class="test-info"><strong>标题:</strong> Funny Cat Videos Compilation 2024</div>
+      <div class="test-info"><strong>预期:</strong> 弹窗（YouTube始终弹窗），标记为娱乐内容</div>
+      <button onclick="runTest('youtube-entertainment')">运行测试</button>
+      <div id="result-youtube-entertainment"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>场景2: YouTube学习视频</h3>
+      <div class="test-info"><strong>网址:</strong> https://www.youtube.com/watch?v=def456</div>
+      <div class="test-info"><strong>标题:</strong> JavaScript Tutorial - Learn Async/Await</div>
+      <div class="test-info"><strong>预期:</strong> 弹窗，标记为学习内容</div>
+      <button onclick="runTest('youtube-learning')">运行测试</button>
+      <div id="result-youtube-learning"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>场景3: 未知学习网站 (educative.io)</h3>
+      <div class="test-info"><strong>网址:</strong> https://www.educative.io/courses/javascript</div>
+      <div class="test-info"><strong>标题:</strong> JavaScript Fundamentals - Interactive Course</div>
+      <div class="test-info"><strong>预期:</strong> AI检测为学习内容，弹窗</div>
+      <button onclick="runTest('unknown-learning')">运行测试</button>
+      <div id="result-unknown-learning"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>场景4: 未知非学习网站 (Reddit)</h3>
+      <div class="test-info"><strong>网址:</strong> https://www.reddit.com/r/funny</div>
+      <div class="test-info"><strong>标题:</strong> Funny Memes and Jokes</div>
+      <div class="test-info"><strong>预期:</strong> AI检测为非学习内容，不弹窗</div>
+      <button onclick="runTest('unknown-non-learning')">运行测试</button>
+      <div id="result-unknown-non-learning"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>场景5: 预定义学习网站 (LeetCode)</h3>
+      <div class="test-info"><strong>网址:</strong> https://leetcode.com/problems/two-sum/</div>
+      <div class="test-info"><strong>标题:</strong> Two Sum - LeetCode</div>
+      <div class="test-info"><strong>预期:</strong> 直接识别为学习网站，弹窗</div>
+      <button onclick="runTest('predefined-learning')">运行测试</button>
+      <div id="result-predefined-learning"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <button onclick="runAllTests()">运行所有测试</button>
+    <div id="summary" class="summary" style="display:none;"></div>
+  </div>
+
+  <div class="test-container">
+    <h2>测试日志</h2>
+    <div id="console" class="console">
+      <div class="console-line">等待运行测试...</div>
+    </div>
+  </div>
+
+  <script>
+    // 模拟测试逻辑
+    const testCases = {
+      'youtube-entertainment': {
+        domain: 'youtube.com',
+        title: 'Funny Cat Videos Compilation 2024',
+        description: 'The funniest cat videos on the internet!',
+        expectedPopup: true,
+        expectedType: 'entertainment'
+      },
+      'youtube-learning': {
+        domain: 'youtube.com',
+        title: 'JavaScript Tutorial - Learn Async/Await',
+        description: 'Learn JavaScript async/await and promises',
+        expectedPopup: true,
+        expectedType: 'learning'
+      },
+      'unknown-learning': {
+        domain: 'educative.io',
+        title: 'JavaScript Fundamentals - Interactive Course',
+        description: 'Learn JavaScript from scratch',
+        expectedPopup: true,
+        expectedType: 'learning'
+      },
+      'unknown-non-learning': {
+        domain: 'reddit.com',
+        title: 'Funny Memes and Jokes',
+        description: 'The funniest memes on Reddit',
+        expectedPopup: false,
+        expectedType: 'non-learning'
+      },
+      'predefined-learning': {
+        domain: 'leetcode.com',
+        title: 'Two Sum - LeetCode',
+        description: 'Solve this interview question',
+        expectedPopup: true,
+        expectedType: 'learning'
+      }
+    };
+
+    function log(message) {
+      const console = document.getElementById('console');
+      const line = document.createElement('div');
+      line.className = 'console-line';
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      console.appendChild(line);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function simulateDetection(testCase) {
+      const learningSites = ['leetcode.com', 'coursera.org', 'github.com'];
+      const contentDetectionSites = ['youtube.com', 'bilibili.com'];
+      
+      log(`检测网站: ${testCase.domain}`);
+      
+      // 检查是否是预定义学习网站
+      if (learningSites.includes(testCase.domain)) {
+        log(`✓ 识别为预定义学习网站`);
+        return { showPopup: true, type: 'learning', reason: '预定义学习网站' };
+      }
+      
+      // 检查是否需要内容检测的网站
+      if (contentDetectionSites.includes(testCase.domain)) {
+        log(`✓ 识别为需要内容检测的网站`);
+        const isLearning = simulateAI(testCase.title, testCase.description);
+        return { 
+          showPopup: true, // YouTube始终弹窗
+          type: isLearning ? 'learning' : 'entertainment',
+          reason: `AI检测: ${isLearning ? '学习内容' : '娱乐内容'}`
+        };
+      }
+      
+      // 未知网站 - AI检测
+      log(`? 未知网站，使用AI检测`);
+      const isLearning = simulateAI(testCase.title, testCase.description);
+      return {
+        showPopup: isLearning,
+        type: isLearning ? 'learning' : 'non-learning',
+        reason: `AI检测: ${isLearning ? '学习相关' : '非学习相关'}`
+      };
+    }
+
+    function simulateAI(title, description) {
+      const content = `${title} ${description}`.toLowerCase();
+      
+      const learningKeywords = ['tutorial', 'learn', 'course', 'javascript', 'programming', 'fundamentals'];
+      const entertainmentKeywords = ['funny', 'meme', 'joke', 'cat', 'compilation'];
+      
+      let learningScore = 0;
+      let entertainmentScore = 0;
+      
+      learningKeywords.forEach(keyword => {
+        if (content.includes(keyword)) learningScore++;
+      });
+      
+      entertainmentKeywords.forEach(keyword => {
+        if (content.includes(keyword)) entertainmentScore++;
+      });
+      
+      log(`AI分析: 学习分数=${learningScore}, 娱乐分数=${entertainmentScore}`);
+      
+      return learningScore > entertainmentScore;
+    }
+
+    function runTest(testId) {
+      const testCase = testCases[testId];
+      const resultDiv = document.getElementById(`result-${testId}`);
+      
+      log(`\n=== 运行测试: ${testId} ===`);
+      
+      const result = simulateDetection(testCase);
+      
+      const passed = result.showPopup === testCase.expectedPopup && 
+                    (testCase.domain === 'youtube.com' || result.type.includes(testCase.expectedType));
+      
+      resultDiv.className = `result ${passed ? 'pass' : 'fail'}`;
+      resultDiv.innerHTML = `
+        ${passed ? '✅ 通过' : '❌ 失败'}<br>
+        结果: ${result.showPopup ? '弹窗' : '不弹窗'}, 类型: ${result.type}<br>
+        原因: ${result.reason}
+      `;
+      
+      log(`测试结果: ${passed ? '通过' : '失败'}`);
+      
+      return passed;
+    }
+
+    function runAllTests() {
+      let passed = 0;
+      let total = 0;
+      
+      log('\n=== 运行所有测试 ===');
+      
+      for (const testId in testCases) {
+        if (runTest(testId)) passed++;
+        total++;
+      }
+      
+      const summaryDiv = document.getElementById('summary');
+      summaryDiv.style.display = 'block';
+      summaryDiv.innerHTML = `
+        <h3>测试总结</h3>
+        <p>总测试数: ${total}</p>
+        <p>通过: ${passed}</p>
+        <p>失败: ${total - passed}</p>
+        <p>${passed === total ? '🎉 所有测试通过！' : '⚠️ 有测试失败'}</p>
+      `;
+      
+      log(`\n测试完成: ${passed}/${total} 通过`);
+    }
+  </script>
+</body>
+</html>

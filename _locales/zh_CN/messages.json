@@ -550,5 +550,17 @@
   },
   "aiDetectionRequired": {
     "message": "需要配置AI API密钥才能智能识别未知网站"
+  },
+  "deleteSite": {
+    "message": "删除网站"
+  },
+  "confirmDeleteSite": {
+    "message": "确定要删除该网站的学习记录吗？此操作无法撤销。"
+  },
+  "siteDeletedSuccess": {
+    "message": "网站已删除"
+  },
+  "siteDeleteFailed": {
+    "message": "删除失败"
   }
 }

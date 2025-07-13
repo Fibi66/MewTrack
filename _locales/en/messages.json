@@ -550,5 +550,17 @@
   },
   "aiDetectionRequired": {
     "message": "AI API key required for intelligent detection of unknown sites"
+  },
+  "deleteSite": {
+    "message": "Delete site"
+  },
+  "confirmDeleteSite": {
+    "message": "Are you sure you want to delete this site's learning records? This action cannot be undone."
+  },
+  "siteDeletedSuccess": {
+    "message": "Site deleted"
+  },
+  "siteDeleteFailed": {
+    "message": "Delete failed"
   }
 }

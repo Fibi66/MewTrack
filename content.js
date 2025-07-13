@@ -269,6 +269,15 @@
           logger.debug(`今天已经为 ${domain} 打过卡了。`);
         }
         return;
+      }
+      
+      // 检查今天是否已经跳过这个网站
+      const hasSkippedToday = await mewTrackStorage.hasSkippedToday(domain);
+      if (hasSkippedToday) {
+        if (typeof logger !== 'undefined') {
+          logger.debug(`今天已经跳过 ${domain}，不再提示。`);
+        }
+        return;
       } else {
         if (typeof logger !== 'undefined') {
           logger.info(`${domain} 今天还未打卡，准备显示打卡弹窗`);
@@ -541,26 +550,7 @@
     // 开始监听页面变化
     const observer = observePageChanges();
     
-    // 定期检测（用于某些动态加载的内容）
-    const intervalId = setInterval(async () => {
-      // 检查扩展上下文
-      if (!isExtensionContextValid()) {
-        // Silently stop periodic checks when context is invalid
-        clearInterval(intervalId);
-        if (observer) observer.disconnect();
-        return;
-      }
-      
-      const domain = siteDetector.getCurrentDomain();
-      const hasVisitedToday = await mewTrackStorage.hasVisitedToday(domain);
-      if (!hasVisitedToday) {
-        if (typeof logger !== 'undefined') {
-          logger.debug('定期检测触发');
-        }
-        // 移除学习网站检查，对所有网站都进行检测
-        await runDetection();
-      }
-    }, 30000); // 每30秒检测一次
+    // 不再进行定期检测，避免重复提示和API调用
   }
 
   init();

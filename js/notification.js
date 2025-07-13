@@ -159,7 +159,16 @@ class NotificationManager {
     const cancelBtn = notification.querySelector('.cancel-btn');
 
     closeBtn.addEventListener('click', () => this.hideNotification());
-    cancelBtn.addEventListener('click', () => this.hideNotification());
+    cancelBtn.addEventListener('click', async () => {
+      // 记录今天跳过这个网站
+      if (typeof mewTrackStorage !== 'undefined') {
+        await mewTrackStorage.markSiteAsSkippedToday(domain);
+        if (typeof logger !== 'undefined') {
+          logger.info(`用户选择稍后打卡 - ${domain}`);
+        }
+      }
+      this.hideNotification();
+    });
     confirmBtn.addEventListener('click', () => {
       // 执行回调函数
       if (this.onConfirmCallback && typeof this.onConfirmCallback === 'function') {
